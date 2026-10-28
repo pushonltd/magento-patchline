@@ -28,7 +28,7 @@ patchline:status:
     reports:
       junit: patchline.xml
 
-# Scheduled job (CI/CD > Schedules, for example weekly): downloads new patches and pushes a branch.
+# Scheduled job (CI/CD > Schedules, daily: Adobe hotfixes have no fixed release date): downloads new patches and pushes a branch.
 # Needs a project access token with write_repository in the variable PATCHLINE_PUSH_TOKEN.
 patchline:sync:
   extends: .patchline

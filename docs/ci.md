@@ -4,7 +4,7 @@ Copy-ready examples live in `examples/`:
 
 | File | What it does |
 |---|---|
-| `examples/github/patchline-sync.yml` | Weekly GitHub workflow that runs `sync`, `verify` and opens a pull request with the new patches. |
+| `examples/github/patchline-sync.yml` | Daily GitHub workflow that runs `sync`, `verify` and opens a pull request with the new patches. |
 | `examples/gitlab/.gitlab-ci.patchline.yml` | `status` job with a JUnit report, plus a scheduled `sync` job. |
 | `examples/composer-scripts.json` | Composer `post-install-cmd` hook that runs the read-only `status` before `@apply-patches`. |
 
@@ -46,9 +46,11 @@ workflows: build from a clean checkout there.
 
 ## Scheduling
 
-Adobe publishes isolated patches on the second Tuesday of the month. Do not write `0 18 8-14 * 2`: when both
-day-of-month and day-of-week are restricted, cron runs when either matches. The GitHub example runs every
-Tuesday (`0 18 * * 2`) and only opens a pull request when something changed.
+Adobe has no fixed release date. Monthly patches usually arrive around the second Tuesday, but out-of-band
+hotfixes can be published on any day, so the GitHub example runs **daily** (`0 6 * * *`) and only opens or updates
+a pull request when something changed; trigger it by hand (`workflow_dispatch`) right after an Adobe security
+bulletin. If you schedule differently, do not combine day-of-month and day-of-week (e.g. `0 18 8-14 * 2`): cron
+runs when either matches.
 
 ## Security notes
 

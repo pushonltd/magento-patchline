@@ -6,11 +6,11 @@ name: Patchline sync
 
 on:
   schedule:
-    # Adobe publishes isolated patches on the second Tuesday of the month. A cron entry that
-    # restricts both day-of-month and day-of-week (for example "0 18 8-14 * 2") runs when EITHER
-    # matches, so it would fire on every Tuesday and on days 8-14. We therefore run every
-    # Tuesday: the job is cheap and opens a PR only when there is something new.
-    - cron: "0 18 * * 2"
+    # Adobe has no fixed release date: monthly patches usually arrive around the second Tuesday,
+    # but out-of-band hotfixes can be published on any day. Run daily — the job is cheap and
+    # opens or updates a pull request only when something changed. Use workflow_dispatch to run
+    # it right after an Adobe security bulletin.
+    - cron: "0 6 * * *"
   workflow_dispatch:
 
 permissions: {}

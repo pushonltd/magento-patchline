@@ -63,6 +63,15 @@ final class ExamplesTest extends TestCase
         }
     }
 
+    public function test_the_github_example_runs_every_day_because_adobe_hotfixes_have_no_fixed_date(): void
+    {
+        $workflow = $this->read('examples/github/patchline-sync.yml');
+
+        preg_match_all('/^\s*-\s*cron:\s*"([^"]+)"/m', $workflow, $matches);
+
+        self::assertSame(['0 6 * * *'], $matches[1]);
+    }
+
     public function test_the_gitlab_example_publishes_the_junit_report_as_an_artifact(): void
     {
         $ci = $this->read('examples/gitlab/.gitlab-ci.patchline.yml');

@@ -188,7 +188,7 @@ prints them. Every downloaded diff is checked against the sha256 in the registry
 
 Patchline prints GitHub annotations and a job summary (`--format=github`) and JUnit XML for GitLab, Jenkins and
 similar systems (`--format=junit`). Ready-made pipelines are in [`examples/`](examples/) and described in
-[`docs/ci.md`](docs/ci.md): a weekly GitHub workflow that opens a pull request with new patches, a GitLab job, and a
+[`docs/ci.md`](docs/ci.md): a daily GitHub workflow that opens a pull request with new patches, a GitLab job, and a
 Composer hook that runs `status` before patches are applied. Keep `sync` out of deploy; run it on a schedule and
 review the result.
 
