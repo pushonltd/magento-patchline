@@ -1,0 +1,107 @@
+{
+    "schema": "patchline/report@1",
+    "base_version": "2.4.9",
+    "edition": "open-source",
+    "installed_components": {
+        "CE": "2.4.9"
+    },
+    "registry_source": "remote",
+    "applied_patches": [
+        "249-2026-09-001-CE"
+    ],
+    "missing_patches": [
+        "249-2026-10-001-CE",
+        "249-VULN-39341-CE"
+    ],
+    "unknown_patches": [],
+    "patches": [
+        {
+            "id": "249-2026-09-001-CE",
+            "area": "CE",
+            "released": "2026-09-08",
+            "state": "applied",
+            "cves": [
+                "CVE-2026-0001"
+            ],
+            "locations": [],
+            "requires": [],
+            "unmet_requirements": [],
+            "warnings": []
+        },
+        {
+            "id": "249-2026-10-001-CE",
+            "area": "CE",
+            "released": "2026-10-13",
+            "state": "queued",
+            "cves": [
+                "CVE-2026-0002",
+                "CVE-2026-0003"
+            ],
+            "locations": [
+                "m2-hotfixes/2026-10-13_249-2026-10-001-CE.patch"
+            ],
+            "requires": [
+                "249-2026-09-001-CE"
+            ],
+            "unmet_requirements": [],
+            "warnings": [
+                "Diff fetched from cache."
+            ]
+        },
+        {
+            "id": "249-VULN-39341-CE",
+            "area": "CE",
+            "released": "2026-10-20",
+            "state": "missing",
+            "cves": [
+                "CVE-2026-0004"
+            ],
+            "locations": [],
+            "requires": [
+                "249-2026-10-001-CE"
+            ],
+            "unmet_requirements": [],
+            "warnings": []
+        }
+    ],
+    "vulnerability_status": {
+        "CVE-2026-0001": {
+            "status": "PROTECTED",
+            "patches": [
+                "249-2026-09-001-CE"
+            ]
+        },
+        "CVE-2026-0002": {
+            "status": "VULNERABLE",
+            "patches": [
+                "249-2026-10-001-CE"
+            ]
+        },
+        "CVE-2026-0003": {
+            "status": "VULNERABLE",
+            "patches": [
+                "249-2026-10-001-CE"
+            ]
+        },
+        "CVE-2026-0004": {
+            "status": "VULNERABLE",
+            "patches": [
+                "249-VULN-39341-CE"
+            ]
+        }
+    },
+    "summary": {
+        "applied": 1,
+        "queued": 1,
+        "duplicate": 0,
+        "misordered": 0,
+        "missing": 1,
+        "entitled": 0,
+        "unknown": 0,
+        "not_applicable": 0
+    },
+    "warnings": [
+        "Registry is older than one hour.",
+        "Ignoring m2-hotfixes/notes.txt."
+    ]
+}

@@ -1,0 +1,10 @@
+{
+    "magento/product-community-edition": {
+        "Patch A": {
+            ">=2.4.9": "a.patch"
+        },
+        "Patch B": {
+            ">=2.4.9": "b.patch"
+        }
+    }
+}

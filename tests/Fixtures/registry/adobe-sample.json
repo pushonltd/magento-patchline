@@ -1,0 +1,396 @@
+{
+  "_schema": {
+    "version": "1.0",
+    "description": "Authoritative registry of Adobe Commerce Isolated security patches. Updated with each monthly release.",
+    "patch_base_url": "https://repo.magento.com/patch",
+    "fields": {
+      "applies_to": "List of component versions this patch targets - must match the installed version of the patch's area",
+      "area": "Component this patch targets - must match a key in _areas",
+      "requires": "List of patch IDs that must be applied before this one (may cross areas)",
+      "cves": "List of CVE identifiers addressed by this patch",
+      "released": "ISO 8601 release date",
+      "file_name": "Plain filename of the downloadable patch; must use the .diff extension",
+      "sha256": "SHA-256 of the downloadable patch file"
+    }
+  },
+  "_areas": {
+    "CE": {
+      "description": "Commerce Community Edition (always present)",
+      "detection": "base_version"
+    },
+    "EE": {
+      "description": "Commerce Enterprise Edition",
+      "composer_package": "magento/product-enterprise-edition"
+    },
+    "B2B": {
+      "description": "B2B for Adobe Commerce",
+      "composer_package": "magento/extension-b2b"
+    },
+    "PageBuilder": {
+      "description": "Page Builder",
+      "composer_package": "magento/module-page-builder"
+    },
+    "Inventory": {
+      "description": "Metapackage with Magento Inventory modules for simple installation",
+      "composer_package": "magento/inventory-metapackage"
+    },
+    "AdobeStock": {
+      "description": "Adobe Stock integration",
+      "composer_package": "magento/adobe-stock-integration"
+    },
+    "AdobeIMS": {
+      "description": "Adobe IMS Integration",
+      "composer_package": "adobe-commerce/adobe-ims-metapackage"
+    },
+    "SecurityPkg": {
+      "description": "Magento Security Package",
+      "composer_package": "magento/security-package"
+    },
+    "SecurityPkgEE": {
+      "description": "Magento Security Package for Enterprise Edition",
+      "composer_package": "magento/security-package-ee"
+    },
+    "SecurityPkgB2B": {
+      "description": "Magento B2B Security Package",
+      "composer_package": "magento/security-package-b2b"
+    },
+    "Eventing": {
+      "description": "Metapackage with required packages for Commerce Eventing Framework",
+      "composer_package": "magento/commerce-eventing"
+    },
+    "AdobeIOEventsClient": {
+      "description": "Adobe Commerce module responsible for managing Adobe I/O Events integration",
+      "composer_package": "magento/module-adobe-io-events-client"
+    },
+    "OOPExtensibility": {
+      "description": "Adobe Commerce out-of-process extensibility module",
+      "composer_package": "magento/module-adobe-commerce-out-of-process-extensibility"
+    },
+    "Webhooks": {
+      "description": "Metapackage with required packages for Commerce Webhooks",
+      "composer_package": "magento/commerce-webhooks"
+    },
+    "BackendUIX": {
+      "description": "Metapackage with required packages for Commerce Backend SDK",
+      "composer_package": "magento/commerce-backend-sdk"
+    }
+  },
+  "patches": {
+    "248p5-2026-07-001-CE": {
+      "applies_to": [
+        "2.4.8-p5"
+      ],
+      "area": "CE",
+      "requires": [],
+      "cves": [
+        "CVE-2026-48356",
+        "CVE-2026-48371",
+        "CVE-2026-48358",
+        "CVE-2026-47988",
+        "CVE-2026-47984",
+        "CVE-2026-47996",
+        "CVE-2026-47992",
+        "CVE-2026-47997",
+        "CVE-2026-47998",
+        "CVE-2026-47999",
+        "CVE-2026-48001",
+        "CVE-2026-48000"
+      ],
+      "released": "2026-07-14",
+      "file_name": "248p5-2026-07-001-CE.diff",
+      "sha256": "334ad9ba8ba7158cc485babe3992fe3993ff697a3e871ad5890ab6d44dca4098"
+    },
+    "248p5-2026-07-001-EE": {
+      "applies_to": [
+        "2.4.8-p5"
+      ],
+      "area": "EE",
+      "requires": [],
+      "cves": [
+        "CVE-2026-47994",
+        "CVE-2026-47997",
+        "CVE-2026-47998",
+        "CVE-2026-48356",
+        "CVE-2026-48371"
+      ],
+      "released": "2026-07-14",
+      "file_name": "248p5-2026-07-001-EE.diff",
+      "sha256": "ce9af489de788ab7b78a73630e63fbcda5c6cda9d92d6d3a2a9a09c0facd51c5"
+    },
+    "249-2026-07-001-CE": {
+      "applies_to": [
+        "2.4.9"
+      ],
+      "area": "CE",
+      "requires": [],
+      "cves": [
+        "CVE-2026-48356",
+        "CVE-2026-48371",
+        "CVE-2026-48358",
+        "CVE-2026-47988",
+        "CVE-2026-47984",
+        "CVE-2026-47996",
+        "CVE-2026-47992",
+        "CVE-2026-47997",
+        "CVE-2026-47998",
+        "CVE-2026-47999",
+        "CVE-2026-48001",
+        "CVE-2026-48000"
+      ],
+      "released": "2026-07-14",
+      "file_name": "249-2026-07-001-CE.diff",
+      "sha256": "1a51872724b0cd2ab75075265d7b321c15273082d382952d1ef997940c9fa8c9"
+    },
+    "249-2026-07-001-EE": {
+      "applies_to": [
+        "2.4.9"
+      ],
+      "area": "EE",
+      "requires": [],
+      "cves": [
+        "CVE-2026-47994",
+        "CVE-2026-47997",
+        "CVE-2026-47998",
+        "CVE-2026-48356",
+        "CVE-2026-48371"
+      ],
+      "released": "2026-07-14",
+      "file_name": "249-2026-07-001-EE.diff",
+      "sha256": "ce9af489de788ab7b78a73630e63fbcda5c6cda9d92d6d3a2a9a09c0facd51c5"
+    },
+    "248p5-2026-08-001-CE": {
+      "applies_to": [
+        "2.4.8-p5"
+      ],
+      "area": "CE",
+      "requires": [
+        "248p5-2026-07-001-CE"
+      ],
+      "cves": [
+        "CVE-2026-48411",
+        "CVE-2026-48412",
+        "CVE-2026-71362"
+      ],
+      "released": "2026-08-11",
+      "file_name": "248p5-2026-08-001-CE.diff",
+      "sha256": "f761f7fb23caddebbac41969067950191f1d975ed4c099c6dd4ac9cc6e8ff634"
+    },
+    "248p5-2026-08-001-EE": {
+      "applies_to": [
+        "2.4.8-p5"
+      ],
+      "area": "EE",
+      "requires": [
+        "248p5-2026-07-001-EE"
+      ],
+      "cves": [
+        "CVE-2026-48416",
+        "CVE-2026-48413",
+        "CVE-2026-48414"
+      ],
+      "released": "2026-08-11",
+      "file_name": "248p5-2026-08-001-EE.diff",
+      "sha256": "2917e6455061d26f175c2e46013e7b8ac12abf4f3df53732dc744e52631ae8db"
+    },
+    "249-2026-08-001-CE": {
+      "applies_to": [
+        "2.4.9"
+      ],
+      "area": "CE",
+      "requires": [
+        "249-2026-07-001-CE"
+      ],
+      "cves": [
+        "CVE-2026-48411",
+        "CVE-2026-48412",
+        "CVE-2026-71362"
+      ],
+      "released": "2026-08-11",
+      "file_name": "249-2026-08-001-CE.diff",
+      "sha256": "292c6579eb3d87e5ad69d2508856d247dd386510ba735a5d3477ab5f188d103f"
+    },
+    "249-2026-08-001-EE": {
+      "applies_to": [
+        "2.4.9"
+      ],
+      "area": "EE",
+      "requires": [
+        "249-2026-07-001-EE"
+      ],
+      "cves": [
+        "CVE-2026-48416",
+        "CVE-2026-48413",
+        "CVE-2026-48414"
+      ],
+      "released": "2026-08-11",
+      "file_name": "249-2026-08-001-EE.diff",
+      "sha256": "60edbffd7a5f7ccd68fb562f9c8e54e5f5c28a5dfbd6ac5d0050f0e610e957d5"
+    },
+    "248p5-2026-09-001-CE": {
+      "applies_to": [
+        "2.4.8-p5"
+      ],
+      "area": "CE",
+      "requires": [
+        "248p5-2026-08-001-CE"
+      ],
+      "cves": [
+        "CVE-2026-76200",
+        "CVE-2026-76201",
+        "CVE-2026-77111",
+        "CVE-2026-77109",
+        "CVE-2026-77774",
+        "CVE-2026-77110",
+        "CVE-2026-76202"
+      ],
+      "released": "2026-09-08",
+      "file_name": "248p5-2026-09-001-CE.diff",
+      "sha256": "ff0694a1638aea8aa26b0e8207fa7d6fc36a5909807d718a314c356feab863fc"
+    },
+    "249-2026-09-001-CE": {
+      "applies_to": [
+        "2.4.9"
+      ],
+      "area": "CE",
+      "requires": [
+        "249-2026-08-001-CE"
+      ],
+      "cves": [
+        "CVE-2026-76200",
+        "CVE-2026-76201",
+        "CVE-2026-77111",
+        "CVE-2026-77109",
+        "CVE-2026-77774",
+        "CVE-2026-77110",
+        "CVE-2026-76202"
+      ],
+      "released": "2026-09-08",
+      "file_name": "249-2026-09-001-CE.diff",
+      "sha256": "b92de99cdc27f72c7953d837dd2e9112dd011e7578026dcf4330ffe7d1100042"
+    },
+    "248p5-2026-10-001-CE": {
+      "applies_to": [
+        "2.4.8-p5"
+      ],
+      "area": "CE",
+      "requires": [
+        "248p5-2026-07-001-CE",
+        "248p5-2026-08-001-CE",
+        "248p5-2026-09-001-CE"
+      ],
+      "cves": [
+        "CVE-2026-92464",
+        "CVE-2026-95630",
+        "CVE-2026-92922",
+        "CVE-2026-103849",
+        "CVE-2026-95631",
+        "CVE-2026-92911",
+        "CVE-2026-100133",
+        "CVE-2026-92909"
+      ],
+      "released": "2026-10-13",
+      "file_name": "248p5-2026-10-001-CE.diff",
+      "sha256": "d94dbb74b6572a96847ceb82edd716a236fedfe7ea368ce334355e29ccee21d4"
+    },
+    "248p5-2026-10-001-EE": {
+      "applies_to": [
+        "2.4.8-p5"
+      ],
+      "area": "EE",
+      "requires": [
+        "248p5-2026-07-001-EE",
+        "248p5-2026-08-001-EE"
+      ],
+      "cves": [
+        "CVE-2026-91013"
+      ],
+      "released": "2026-10-13",
+      "file_name": "248p5-2026-10-001-EE.diff",
+      "sha256": "a88bc7ae033d92f048f9b97b1053150412c8cfecfae4c57ec348afbca3065a00"
+    },
+    "248p5-2026-10-002-CE": {
+      "applies_to": [
+        "2.4.8-p5"
+      ],
+      "area": "CE",
+      "requires": [
+        "248p5-2026-07-001-CE",
+        "248p5-2026-08-001-CE",
+        "248p5-2026-09-001-CE",
+        "248p5-2026-10-001-CE"
+      ],
+      "cves": [],
+      "released": "2026-10-13",
+      "file_name": "248p5-2026-10-002-CE.diff",
+      "sha256": "73ed0c04b685db9f321d6bdf6815edb03f74a9f680eb2e0f015e69453f890fe9"
+    },
+    "249-2026-10-001-CE": {
+      "applies_to": [
+        "2.4.9"
+      ],
+      "area": "CE",
+      "requires": [
+        "249-2026-07-001-CE",
+        "249-2026-08-001-CE",
+        "249-2026-09-001-CE"
+      ],
+      "cves": [
+        "CVE-2026-92464",
+        "CVE-2026-95630",
+        "CVE-2026-92922",
+        "CVE-2026-103849",
+        "CVE-2026-95631",
+        "CVE-2026-92911",
+        "CVE-2026-100133",
+        "CVE-2026-92909",
+        "CVE-2026-91013"
+      ],
+      "released": "2026-10-13",
+      "file_name": "249-2026-10-001-CE.diff",
+      "sha256": "9cecb600c0fbb71ac3e52e10926ef4f0f5b8cd770d0c502cd8dce4f5642eff81"
+    },
+    "249-2026-10-001-EE": {
+      "applies_to": [
+        "2.4.9"
+      ],
+      "area": "EE",
+      "requires": [
+        "249-2026-07-001-EE",
+        "249-2026-08-001-EE"
+      ],
+      "cves": [
+        "CVE-2026-91013"
+      ],
+      "released": "2026-10-13",
+      "file_name": "249-2026-10-001-EE.diff",
+      "sha256": "9bd1fe84381c7d26b304aa31fb88a9d0388c52ae4d7e65b43c1dd6205b51778b"
+    },
+    "248p5-VULN-39341-CE": {
+      "applies_to": [
+        "2.4.8-p5",
+        "2.4.8-p4"
+      ],
+      "area": "CE",
+      "requires": [],
+      "cves": [
+        "CVE-2026-75650"
+      ],
+      "released": "2026-09-07",
+      "file_name": "VULN-39341-248-p5.diff",
+      "sha256": "75266ec5548f356a0572c2af74ee5f05aadfab40ede374e8d39bc4a39b6b8ec8"
+    },
+    "249-VULN-39341-CE": {
+      "applies_to": [
+        "2.4.9"
+      ],
+      "area": "CE",
+      "requires": [],
+      "cves": [
+        "CVE-2026-75650"
+      ],
+      "released": "2026-09-07",
+      "file_name": "VULN-39341-249.diff",
+      "sha256": "8df23110e1909e2d5f0c2f0ecbe7f803670dfb0c9c3d15a527371c04b7825bf7"
+    }
+  }
+}

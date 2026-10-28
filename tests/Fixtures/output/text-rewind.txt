@@ -1,0 +1,6 @@
+Rewinding the patch queue, newest entry first
+  3. m2-hotfixes/2026-01-13_rewind-hotfix.patch: reversed
+  2. vendor/magento/magento-cloud-patches/patches/b.patch (Patch B): reversed
+  1. vendor/magento/magento-cloud-patches/patches/a.patch (Patch A): reversed
+
+Reversed 3 patches. Run ece-patches apply next.

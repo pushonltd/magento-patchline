@@ -1,0 +1,63 @@
+{
+    "schema": "patchline/report@1",
+    "base_version": "2.4.9",
+    "edition": "commerce",
+    "installed_components": {
+        "CE": "2.4.9",
+        "EE": "2.4.9"
+    },
+    "registry_source": "cache",
+    "applied_patches": [
+        "249-2026-09-001-CE"
+    ],
+    "missing_patches": [],
+    "unknown_patches": [],
+    "patches": [
+        {
+            "id": "249-2026-09-001-CE",
+            "area": "CE",
+            "released": "2026-09-08",
+            "state": "applied",
+            "cves": [
+                "CVE-2026-0001"
+            ],
+            "locations": [],
+            "requires": [],
+            "unmet_requirements": [],
+            "warnings": []
+        }
+    ],
+    "vulnerability_status": {
+        "CVE-2026-0001": {
+            "status": "PROTECTED",
+            "patches": [
+                "249-2026-09-001-CE"
+            ]
+        }
+    },
+    "summary": {
+        "applied": 1,
+        "queued": 0,
+        "duplicate": 0,
+        "misordered": 0,
+        "missing": 0,
+        "entitled": 0,
+        "unknown": 0,
+        "not_applicable": 0
+    },
+    "warnings": [],
+    "verify": {
+        "success": false,
+        "steps": [
+            {
+                "position": 1,
+                "path": "m2-hotfixes/bad.patch",
+                "outcome": "failed",
+                "output": "Hunk #1 FAILED"
+            }
+        ],
+        "notes": [
+            "A note."
+        ]
+    }
+}

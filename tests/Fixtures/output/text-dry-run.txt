@@ -1,0 +1,32 @@
+Adobe Commerce 2.4.9
+Registry: stale cache
+Components: CE 2.4.9, EE 2.4.9
+
+2026-10-01  CE  249-APPLIED-CE        applied         1 CVE
+2026-10-02  CE  249-QUEUED-CE         queued          m2-hotfixes/2026-10-13_249-Q-CE.patch  1 CVE
+2026-10-03  CE  249-DUPLICATE-CE      duplicate       m2-hotfixes/2026-10-13_249-Q-CE.patch, m2-hotfixes/copy.patch  1 CVE
+2026-10-04  CE  249-MISORDERED-CE     misordered      1 CVE
+2026-10-05  CE  249-MISSING-CE        missing         1 CVE
+2026-10-06  CE  249-ENTITLED-CE       entitled        1 CVE
+2026-10-07  CE  249-UNKNOWN-CE        unknown         1 CVE
+2026-10-08  CE  249-NOTAPPLICABLE-CE  not_applicable  1 CVE
+
+Sync (dry run, nothing changed)
+  [planned] download 249-2026-10-001-CE to m2-hotfixes/a.patch
+  [planned] rename m2-hotfixes/c.patch to m2-hotfixes/d.patch
+
+Verify (replay of the patch queue)
+  1. m2-hotfixes/ok.patch: would apply
+Verify passed: ece-patches apply should succeed.
+
+Cross-check with Adobe patch-status
+  Both tools agree on 1 patch.
+
+Warnings
+  - Registry is older than one hour.
+  - Ignoring m2-hotfixes/notes.txt.
+  - 249-QUEUED-CE: Diff fetched from cache.
+  - 249-QUEUED-CE: Second warning.
+
+Summary: 1 applied, 1 queued, 1 duplicate, 1 misordered, 1 missing, 1 entitled, 1 unknown, 1 not_applicable
+Next: run patchline sync to download the missing patches.

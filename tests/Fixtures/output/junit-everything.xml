@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="patchline" tests="8" failures="3" skipped="2">
+    <testcase classname="CE" name="249-APPLIED-CE"/>
+    <testcase classname="CE" name="249-QUEUED-CE"/>
+    <testcase classname="CE" name="249-DUPLICATE-CE">
+      <failure message="249-DUPLICATE-CE is queued more than once" type="duplicate"></failure>
+    </testcase>
+    <testcase classname="CE" name="249-MISORDERED-CE">
+      <failure message="249-MISORDERED-CE is queued before a patch it requires" type="misordered"></failure>
+    </testcase>
+    <testcase classname="CE" name="249-MISSING-CE">
+      <failure message="249-MISSING-CE is not applied and not queued" type="missing"></failure>
+    </testcase>
+    <testcase classname="CE" name="249-ENTITLED-CE">
+      <skipped message="entitled"/>
+    </testcase>
+    <testcase classname="CE" name="249-UNKNOWN-CE">
+      <skipped message="unknown"/>
+    </testcase>
+    <testcase classname="CE" name="249-NOTAPPLICABLE-CE"/>
+  </testsuite>
+  <testsuite name="patchline-sync" tests="6" failures="1" skipped="1">
+    <testcase classname="sync" name="download 249-2026-10-001-CE to m2-hotfixes/a.patch"/>
+    <testcase classname="sync" name="download 249-2026-10-001-CE to m2-hotfixes/b.patch">
+      <failure message="HTTP 500" type="failed"></failure>
+    </testcase>
+    <testcase classname="sync" name="rename m2-hotfixes/c.patch to m2-hotfixes/d.patch">
+      <skipped message="skipped"/>
+    </testcase>
+    <testcase classname="sync" name="remove m2-hotfixes/e.patch"/>
+    <testcase classname="sync" name="Check the order."/>
+    <testcase classname="sync" name="Check, again | now."/>
+  </testsuite>
+  <testsuite name="patchline-verify" tests="5" failures="1" skipped="1">
+    <testcase classname="verify" name="m2-hotfixes/a.patch"/>
+    <testcase classname="verify" name="m2-hotfixes/b.patch"/>
+    <testcase classname="verify" name="m2-hotfixes/c.patch"/>
+    <testcase classname="verify" name="m2-hotfixes/d.patch">
+      <skipped message="skipped: target module(s) are not installed"/>
+    </testcase>
+    <testcase classname="verify" name="m2-hotfixes/e.patch">
+      <failure message="m2-hotfixes/e.patch would fail" type="failed">patching file x.php
+Hunk #1 FAILED at 3.
+100% &amp; &lt;broken&gt;</failure>
+    </testcase>
+  </testsuite>
+  <testsuite name="patchline-cross-check" tests="2" failures="2" skipped="0">
+    <testcase classname="cross-check" name="249-X-CE">
+      <failure message="249-X-CE: Patchline detects applied, Adobe patch-status reports unknown." type="disagreement"></failure>
+    </testcase>
+    <testcase classname="cross-check" name="249-Y-CE">
+      <failure message="249-Y-CE: Patchline detects not_applied, Adobe patch-status reports not_listed." type="disagreement"></failure>
+    </testcase>
+  </testsuite>
+</testsuites>

@@ -1,0 +1,16 @@
+/vendor/
+/composer.lock
+/.phpunit.cache/
+/.phpunit.result.cache
+/build/coverage/
+/tools/infection/vendor/
+/tools/infection/composer.lock
+/dist/
+.DS_Store
+/build/infection/
+/build/tmp/
+/tools/box/vendor/
+/tools/box/composer.lock
+/.idea/
+/.claude/plans/
+/.claude/settings.local.json

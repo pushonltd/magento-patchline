@@ -1,0 +1,42 @@
+#!/usr/bin/env php
+<?php
+
+declare(strict_types=1);
+
+use Patchline\Cli\Application;
+
+// Keep PHP notices out of stdout: the oldest allowed console/guzzle releases emit deprecations on newer PHP versions
+// that would otherwise corrupt machine-readable output.
+ini_set('display_errors', 'stderr');
+error_reporting(E_ALL & ~E_DEPRECATED & ~E_USER_DEPRECATED);
+
+(static function (): void {
+    $autoloadCandidates = [
+        $GLOBALS['_composer_autoload_path'] ?? null,
+        __DIR__ . '/../vendor/autoload.php',
+        __DIR__ . '/../../../autoload.php',
+    ];
+
+    foreach ($autoloadCandidates as $candidate) {
+        if (is_string($candidate) && is_file($candidate)) {
+            require $candidate;
+
+            return;
+        }
+    }
+
+    fwrite(STDERR, "patchline: cannot find the Composer autoloader. Run \"composer install\" in the project first.\n");
+
+    exit(3);
+})();
+
+$arguments = array_slice(is_array($_SERVER['argv'] ?? null) ? $_SERVER['argv'] : [], 1);
+$environment = array_filter(getenv(), 'is_string');
+
+exit((new Application())->run(
+    array_values(array_filter($arguments, 'is_string')),
+    $environment,
+    (string) getcwd(),
+    STDOUT,
+    STDERR,
+));

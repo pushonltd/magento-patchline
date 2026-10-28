@@ -1,0 +1,17 @@
+::warning::249-QUEUED-CE: Diff fetched from cache.
+::warning::249-QUEUED-CE: Second warning.
+::error title=duplicate::249-DUPLICATE-CE is queued more than once. Run patchline sync --prune to remove the extra copies.
+::error title=misordered::249-MISORDERED-CE is queued before a patch it requires. Run patchline sync --adopt to fix the file names.
+::error title=missing::249-MISSING-CE is not applied and not queued. Run patchline sync to download it.
+::warning title=entitled::249-ENTITLED-CE needs an entitlement this store lacks; patchline does not install it.
+::warning title=unknown::249-UNKNOWN-CE could not be checked against the installed code.
+::warning::Registry is older than one hour.
+::warning::Ignoring m2-hotfixes/notes.txt.
+::error title=sync::download 249-2026-10-001-CE to m2-hotfixes/b.patch: HTTP 500
+::warning title=sync::Check the order.
+::warning title=sync::Check, again | now.
+::warning title=verify,file=m2-hotfixes/c.patch::m2-hotfixes/c.patch is already applied once vendor/bin/patch-status is ignored.
+::error title=verify,file=m2-hotfixes/e.patch::m2-hotfixes/e.patch would fail: patching file x.php%0AHunk #1 FAILED at 3.%0A100%25 & <broken>
+::warning title=cross-check::249-X-CE: Patchline detects applied, Adobe patch-status reports unknown.
+::warning title=cross-check::249-Y-CE: Patchline detects not_applied, Adobe patch-status reports not_listed.
+::notice::Summary: 1 applied, 1 queued, 1 duplicate, 1 misordered, 1 missing, 1 entitled, 1 unknown, 1 not_applicable

@@ -1,0 +1,22 @@
+{
+    "$schema": "https://raw.githubusercontent.com/box-project/box/main/res/schema.json",
+    "main": "bin/patchline",
+    "output": "dist/patchline.phar",
+    "compression": "NONE",
+    "banner": false,
+    "directories": ["src"],
+    "finder": [
+        {
+            "in": "vendor",
+            "name": "*.php",
+            "exclude": ["Tests", "tests", "Test", "test", "Fixtures", "bin"]
+        },
+        {
+            "in": "vendor/symfony",
+            "name": "completion.*",
+            "path": "console/Resources"
+        }
+    ],
+    "files": ["composer.json"],
+    "check-requirements": true
+}

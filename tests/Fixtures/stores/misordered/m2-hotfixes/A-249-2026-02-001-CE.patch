@@ -1,0 +1,6 @@
+diff --git a/vendor/magento/module-b/b.php b/vendor/magento/module-b/b.php
+--- a/vendor/magento/module-b/b.php
++++ b/vendor/magento/module-b/b.php
+@@ -1,1 +1,1 @@
+-one
++two

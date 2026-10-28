@@ -1,0 +1,24 @@
+Magento Open Source 2.4.9
+Registry: remote
+Components: CE 2.4.9
+
+2026-09-08  CE  249-2026-09-001-CE  applied  1 CVE
+2026-10-13  CE  249-2026-10-001-CE  queued   m2-hotfixes/2026-10-13_249-2026-10-001-CE.patch  2 CVEs
+2026-10-20  CE  249-VULN-39341-CE   missing  1 CVE
+
+Verify (replay of the patch queue)
+  1. m2-hotfixes/ok.patch: would apply
+  2. m2-hotfixes/bad.patch: would fail
+  Patch output for m2-hotfixes/bad.patch:
+    Hunk #1 FAILED at 10.
+    1 out of 1 hunk FAILED
+  Note: A note.
+Verify failed: ece-patches apply would stop at m2-hotfixes/bad.patch.
+
+Warnings
+  - Registry is older than one hour.
+  - Ignoring m2-hotfixes/notes.txt.
+  - 249-2026-10-001-CE: Diff fetched from cache.
+
+Summary: 1 applied, 1 queued, 1 missing
+Next: run patchline sync to download the missing patches.

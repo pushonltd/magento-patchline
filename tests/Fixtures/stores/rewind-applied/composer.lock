@@ -1,0 +1,12 @@
+{
+    "packages": [
+        {
+            "name": "magento/product-community-edition",
+            "version": "2.4.9"
+        },
+        {
+            "name": "magento/magento-cloud-patches",
+            "version": "1.1.18"
+        }
+    ]
+}

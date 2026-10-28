@@ -1,0 +1,12 @@
+parameters:
+    level: 10
+    paths:
+        - src
+        - tests
+        - build
+        - bin/patchline
+        - tools/coverage-check.php
+        - tools/run-tests.php
+    checkUninitializedProperties: true
+    treatPhpDocTypesAsCertain: false
+    reportUnmatchedIgnoredErrors: true
