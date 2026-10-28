@@ -21,6 +21,7 @@ use Patchline\Cli\Config;
 use Patchline\Cli\ConfigResolver;
 use Patchline\Cli\Console\ConsoleApplication;
 use Patchline\Cli\Console\PatchlineCommand;
+use Patchline\Cli\Console\RewindCommand;
 use Patchline\Cli\Console\StreamConsoleOutput;
 use Patchline\Cli\Container;
 use Patchline\Cli\Output\FormattedOutput;
@@ -54,6 +55,7 @@ use Patchline\PackageVersion;
 use Patchline\Queue\PatchQueue;
 use Patchline\Queue\QueueEntry;
 use Patchline\Queue\QueueEntryDiff;
+use Patchline\Queue\QueueReader;
 use Patchline\Queue\Source\CloudPatchesSource;
 use Patchline\Queue\Source\HotfixDirSource;
 use Patchline\Queue\Source\SourceResult;
@@ -96,6 +98,7 @@ use PHPUnit\Framework\TestCase;
 #[CoversClass(Container::class)]
 #[CoversClass(ConsoleApplication::class)]
 #[CoversClass(PatchlineCommand::class)]
+#[UsesClass(RewindCommand::class)]
 #[CoversClass(StreamConsoleOutput::class)]
 #[CoversClass(ConfigResolver::class)]
 #[CoversClass(Inspector::class)]
@@ -142,6 +145,7 @@ use PHPUnit\Framework\TestCase;
 #[UsesClass(PatchQueue::class)]
 #[UsesClass(QueueEntry::class)]
 #[UsesClass(QueueEntryDiff::class)]
+#[UsesClass(QueueReader::class)]
 #[UsesClass(CloudPatchesSource::class)]
 #[UsesClass(HotfixDirSource::class)]
 #[UsesClass(SourceResult::class)]

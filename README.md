@@ -38,6 +38,9 @@ That is every `composer install` on a local DDEV or a host that keeps `vendor/` 
 **`patchline rewind` takes the queue back out first.** Then `ece-patches apply` starts clean every time.
 On a fresh install there is nothing to rewind, and it exits 0.
 
+Check the result with `vendor/bin/patchline status`.
+Keep it out of the scripts. It needs the registry, and it fails as soon as Adobe ships a patch you haven't synced.
+
 ## Where the patches come from
 
 Straight from Adobe.

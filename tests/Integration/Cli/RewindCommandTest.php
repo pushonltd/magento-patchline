@@ -19,6 +19,7 @@ use Patchline\Detection\DiffSection;
 use Patchline\Detection\FilteredDiff;
 use Patchline\Detection\PatchRun;
 use Patchline\Detection\SystemPatchBinary;
+use Patchline\Infrastructure\GuzzleHttpClient;
 use Patchline\Infrastructure\LocalFilesystem;
 use Patchline\Infrastructure\ProcessResult;
 use Patchline\Infrastructure\SymfonyProcessRunner;
@@ -28,6 +29,7 @@ use Patchline\PackageVersion;
 use Patchline\Queue\PatchQueue;
 use Patchline\Queue\QueueEntry;
 use Patchline\Queue\QueueEntryDiff;
+use Patchline\Queue\QueueReader;
 use Patchline\Queue\Source\CloudPatchesSource;
 use Patchline\Queue\Source\HotfixDirSource;
 use Patchline\Queue\Source\SourceResult;
@@ -59,6 +61,8 @@ use PHPUnit\Framework\TestCase;
 #[UsesClass(RewindStep::class)]
 #[UsesClass(RewindOutcome::class)]
 #[UsesClass(QueueEntryDiff::class)]
+#[UsesClass(QueueReader::class)]
+#[UsesClass(GuzzleHttpClient::class)]
 #[UsesClass(DiffParser::class)]
 #[UsesClass(DiffSection::class)]
 #[UsesClass(FilteredDiff::class)]

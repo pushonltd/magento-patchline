@@ -9,6 +9,7 @@ use Patchline\Cli\Config;
 use Patchline\Cli\ConfigResolver;
 use Patchline\Cli\Console\ConsoleApplication;
 use Patchline\Cli\Console\PatchlineCommand;
+use Patchline\Cli\Console\RewindCommand;
 use Patchline\Cli\Container;
 use Patchline\Cli\OutputFormat;
 use Patchline\Exception\RuntimeFailure;
@@ -29,6 +30,7 @@ use PHPUnit\Framework\TestCase;
 #[UsesClass(Application::class)]
 #[UsesClass(ConsoleApplication::class)]
 #[UsesClass(PatchlineCommand::class)]
+#[UsesClass(RewindCommand::class)]
 #[UsesClass(Container::class)]
 #[UsesClass(GuzzleHttpClient::class)]
 #[UsesClass(SymfonyProcessRunner::class)]
