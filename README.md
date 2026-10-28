@@ -7,7 +7,18 @@ patches your store has, downloads the missing ones into `m2-hotfixes/` and check
 accept them.
 
 Since `magento-cloud-patches` 1.1.18, Adobe's monthly isolated patches no longer reach Magento Open Source through
-that package. Patchline fills the gap using the same registry as Adobe's own `vendor/bin/patch-status`.
+that package. Patchline fills that gap.
+
+## Data source
+
+Patchline reads Adobe's patch registry at
+[`repo.magento.com/patch/patch-registry.json`](https://repo.magento.com/patch/patch-registry.json) and downloads the
+diffs it lists from `repo.magento.com/patch/`, checking each one against the sha256 in the registry. It is the same
+registry Adobe's Commerce Version Tool (`vendor/bin/patch-status`) uses.
+
+Adobe's Engineering Manager for Adobe Commerce Security and Compliance confirmed that the registry is intended for
+public, automated use and should remain compatible with the Commerce Version Tool. Which patches are available for
+a version depends on its licensing and extended support; Commerce-only patches need repo.magento.com keys.
 
 ## Install
 
