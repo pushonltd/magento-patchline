@@ -7,6 +7,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.0.2] - 2026-10-28
+
+### Added
+
+- `patchline` and `patchline list` open with a `pushonltd/` + `patchline` banner and the version.
+- Jiří Brada listed as an author next to PushON Ltd.
+
+### Changed
+
+- The version comes from Composer's install metadata instead of a constant: the release tag without its `v`, or the
+  branch plus the short commit for a development install. The PHAR reports the version it was built from the same way.
+- Requires `composer-runtime-api` `^2.0` (Composer 2, which every supported Magento version needs).
+- Accepts `guzzlehttp/guzzle` 8 as well as 7.4.5 and later.
+
 ## [0.0.1] - 2026-10-28
 
 ### Added
@@ -22,5 +36,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Configuration through flags, `PATCHLINE_*` environment variables and `extra.patchline` in `composer.json`.
 - Self-contained `patchline.phar` with a checksum.
 
-[Unreleased]: https://github.com/pushonltd/magento-patchline/compare/v0.0.1...HEAD
+[Unreleased]: https://github.com/pushonltd/magento-patchline/compare/v0.0.2...HEAD
+[0.0.2]: https://github.com/pushonltd/magento-patchline/compare/v0.0.1...v0.0.2
 [0.0.1]: https://github.com/pushonltd/magento-patchline/releases/tag/v0.0.1
