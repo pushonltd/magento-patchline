@@ -155,23 +155,31 @@ final class WorkflowPolicyTest extends TestCase
         self::assertMatchesRegularExpression('/^permissions:\s*\{\}\s*$/m', $this->read($file));
     }
 
-    public function test_the_test_matrix_covers_php_8_1_to_8_5_and_macos(): void
+    public function test_the_test_matrix_covers_php_8_2_to_8_5_and_macos(): void
     {
         $ci = $this->read('.github/workflows/ci.yml');
 
-        foreach (['8.1', '8.2', '8.3', '8.4', '8.5'] as $version) {
+        foreach (['8.2', '8.3', '8.4', '8.5'] as $version) {
             self::assertMatchesRegularExpression('/php:\s*\[[^\]]*"' . preg_quote($version, '/') . '"/', $ci);
         }
         self::assertMatchesRegularExpression('/os:\s*\[ubuntu-latest\]/', $ci);
         self::assertMatchesRegularExpression('/os:\s*macos-latest\s*\n\s*php:\s*"8\.5"/', $ci);
     }
 
-    public function test_the_test_matrix_includes_a_prefer_lowest_run_on_php_8_1(): void
+    public function test_the_test_matrix_includes_a_prefer_lowest_run_on_php_8_2(): void
     {
         $ci = $this->read('.github/workflows/ci.yml');
 
-        self::assertMatchesRegularExpression('/php:\s*"8\.1"\s*\n\s*dependencies:\s*lowest/', $ci);
+        self::assertMatchesRegularExpression('/php:\s*"8\.2"\s*\n\s*dependencies:\s*lowest/', $ci);
         self::assertStringContainsString('--prefer-lowest', $ci);
+    }
+
+    public function test_no_workflow_or_package_targets_the_end_of_life_php_8_1(): void
+    {
+        self::assertMatchesRegularExpression('/"php":\s*">=8\.2"/', $this->read('composer.json'));
+        foreach (['ci.yml', 'release.yml', 'zizmor.yml'] as $workflow) {
+            self::assertDoesNotMatchRegularExpression('/"8\.1"/', $this->read('.github/workflows/' . $workflow));
+        }
     }
 
     public function test_the_coverage_job_fails_below_95_percent_line_coverage(): void
@@ -201,7 +209,7 @@ final class WorkflowPolicyTest extends TestCase
         $ci = $this->read('.github/workflows/ci.yml');
 
         self::assertMatchesRegularExpression('/name: dist\b/', $ci);
-        self::assertMatchesRegularExpression('/phar:\s*\n(?:.*\n)*?\s+php:\s*\["8\.1",\s*"8\.5"\]/', $ci);
+        self::assertMatchesRegularExpression('/phar:\s*\n(?:.*\n)*?\s+php:\s*\["8\.2",\s*"8\.5"\]/', $ci);
     }
 
     public function test_the_release_workflow_attaches_the_phar_and_its_checksum_and_attests_the_phar(): void

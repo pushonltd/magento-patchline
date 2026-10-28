@@ -23,12 +23,13 @@ compatible with its own checker, `vendor/bin/patch-status` (the Commerce Version
 
 ## Runtime constraints
 
-- PHP >= 8.1, extensions `json`, `hash`, `openssl`.
-- Runtime dependencies are limited to libraries **every supported Magento line (2.4.4–2.4.9) already installs**,
+- PHP >= 8.2 (8.1 is end of life), extensions `json`, `hash`, `openssl`.
+- Supported stores: Magento 2.4.6 and newer (2.4.4/2.4.5 only run on PHP 7.4/8.1, which is end of life).
+- Runtime dependencies are limited to libraries **every supported Magento line (2.4.6–2.4.9) already installs**,
   with constraints loose enough to accept whichever version the store has locked:
-  `composer/semver` `^1.5 || ^3.2` (the same constraint rules ece-patches uses), `guzzlehttp/guzzle` `^7.4.5`
+  `composer/semver` `^3.2` (the same constraint rules ece-patches uses), `guzzlehttp/guzzle` `^7.4.5`
   (proxies, TLS, strips `Authorization` on cross-origin redirects), `symfony/console` and `symfony/process`
-  `^4.4 || ^5.4 || ^6.4 || ^7.0`. Code must work with the lowest and highest of each (CI: `--prefer-lowest`).
+  `^5.4 || ^6.4 || ^7.0`. Code must work with the lowest and highest of each (CI: `--prefer-lowest`).
   No other runtime dependency may be added.
 - Shipped as a Composer package and as a self-contained PHAR (`dist/patchline.phar`, built with Box) that runs
   before or without `composer install`.

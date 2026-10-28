@@ -28,7 +28,7 @@ final class ConsoleApplication extends Application
     }
 
     /**
-     * Registered here because Application::add() was renamed in Console 7.4 and addCommand() does not exist in 4.4.
+     * Registered here because Application::add() was renamed in Console 7.4 and addCommand() does not exist before 7.4.
      *
      * @return array<\Symfony\Component\Console\Command\Command>
      */

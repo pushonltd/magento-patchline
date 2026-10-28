@@ -16,23 +16,23 @@
   - `declare(strict_types=1);` in every PHP file
   - parameter, property and return type hints required (native where possible)
   - no unused `use` statements; alphabetically sorted uses
-  - `final` classes by default; value objects are `final readonly`-style (readonly properties, PHP 8.1)
+  - `final` classes by default; value objects are `final readonly`-style (readonly properties or readonly classes)
   - early returns; no `else` after `return`/`throw`
   - trailing commas in multi-line arrays, calls and signatures
 - `composer cs` checks, `composer cs-fix` runs `phpcbf`.
 
 ## PHP version
 
-- Code must run on **PHP 8.1**: no readonly classes, no `#[\Override]`, no typed class constants,
-  no `json_validate()`. Use `enum` and readonly properties freely.
+- Code must run on **PHP 8.2** (8.1 is end of life and not supported): no `#[\Override]`, no typed class
+  constants, no `json_validate()` (all 8.3+). Enums, readonly properties and readonly classes are fine.
 - No `composer.lock` is committed (library). CI resolves dependencies per PHP version and also runs once with
-  `--prefer-lowest` on PHP 8.1, so the declared constraints are honest.
+  `--prefer-lowest` on PHP 8.2, so the declared constraints are honest.
 
 ## Dependencies
 
 - Only the four runtime libraries listed in `.claude/architecture.md` (all already installed by Magento).
-  Use only API available in **every** allowed major (symfony/console + process 4.4 → 7.x, composer/semver 1.5
-  and 3.x, guzzle 7.4.5+): no `#[AsCommand]`-only registration, no newer-only methods. Library types stay at the
+  Use only API available in **every** allowed major (symfony/console + process 5.4 → 7.x, composer/semver 3.x,
+  guzzle 7.4.5+): no `#[AsCommand]`-only registration, no newer-only methods. Library types stay at the
   edges (adapters in `Infrastructure`, commands in `Cli`); domain code never imports them.
 
 ## Naming

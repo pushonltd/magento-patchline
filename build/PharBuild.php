@@ -10,7 +10,7 @@ use RuntimeException;
  * Builds dist/patchline.phar with Box from a clean staging copy that only has the runtime dependencies.
  *
  * Staging keeps phpunit, phpstan and friends out of the PHAR whatever the working copy has installed, and resolves
- * the libraries as Composer would for PHP 8.1, so the PHAR runs on the lowest supported PHP.
+ * the libraries as Composer would for PHP 8.2, so the PHAR runs on the lowest supported PHP.
  */
 final class PharBuild
 {
@@ -93,7 +93,7 @@ final class PharBuild
             'name' => $composer['name'] ?? 'pushonltd/magento-patchline',
             'require' => $composer['require'],
             'autoload' => $composer['autoload'],
-            'config' => ['sort-packages' => true, 'platform' => ['php' => '8.1.0']],
+            'config' => ['sort-packages' => true, 'platform' => ['php' => '8.2.0']],
         ], JSON_THROW_ON_ERROR | JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
     }
 

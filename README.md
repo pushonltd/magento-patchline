@@ -58,9 +58,10 @@ Sync (dry run, nothing changed)
 
 ### Requirements
 
-- PHP 8.1 or newer with `ext-json`, `ext-hash` and `ext-openssl`.
+- Magento 2.4.6 or newer (earlier lines only run on end-of-life PHP).
+- PHP 8.2 or newer with `ext-json`, `ext-hash` and `ext-openssl`.
 - A `patch` program on the `PATH` (GNU patch on Linux, the system `patch` on macOS). Detection and `verify` need it.
-- Runtime dependencies are only libraries that every Magento 2.4.4 to 2.4.9 store already installs:
+- Runtime dependencies are only libraries that every Magento 2.4.6 to 2.4.9 store already installs:
   `composer/semver`, `guzzlehttp/guzzle`, `symfony/console` and `symfony/process` (constraints in `composer.json`).
 - Behind a proxy, set `HTTPS_PROXY` (and `NO_PROXY` if needed).
 

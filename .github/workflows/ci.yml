@@ -67,12 +67,12 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu-latest]
-        php: ["8.1", "8.2", "8.3", "8.4", "8.5"]
+        php: ["8.2", "8.3", "8.4", "8.5"]
         include:
           - os: macos-latest
             php: "8.5"
           - os: ubuntu-latest
-            php: "8.1"
+            php: "8.2"
             dependencies: lowest
     steps:
       - name: Check out the repository
@@ -224,7 +224,7 @@ jobs:
         with:
           persist-credentials: false
 
-      # Box itself needs PHP 8.2; the PHAR it builds is resolved for PHP 8.1 and tested on 8.1 below.
+      # The PHAR is resolved for PHP 8.2, the lowest supported version, and tested on 8.2 and 8.5 below.
       - name: Set up PHP
         uses: shivammathur/setup-php@eb7c497e18156a6bbabfef1d3a82760b9eda3962 # 2.40.0
         with:
@@ -277,7 +277,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        php: ["8.1", "8.5"]
+        php: ["8.2", "8.5"]
     steps:
       - name: Check out the repository
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1

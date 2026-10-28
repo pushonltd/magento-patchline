@@ -15,7 +15,7 @@ review the resulting pull request and let the normal deploy only run `status`.
 ## Self-contained PHAR
 
 Every release attaches `patchline.phar` and `patchline.phar.sha256`. The PHAR bundles its dependencies, runs with
-plain `php patchline.phar` on PHP 8.1+ before or without `composer install`, and needs no `vendor/` directory.
+plain `php patchline.phar` on PHP 8.2+ before or without `composer install`, and needs no `vendor/` directory.
 Verify it with `sha256sum --check patchline.phar.sha256` or `gh attestation verify patchline.phar --repo pushonltd/magento-patchline`.
 To build it yourself: `composer update --working-dir=tools/box && composer build` (output: `dist/`).
 
