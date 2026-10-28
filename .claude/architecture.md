@@ -31,7 +31,9 @@ compatible with its own checker, `vendor/bin/patch-status` (the Commerce Version
   `composer/semver` `^3.2` (the same constraint rules ece-patches uses), `guzzlehttp/guzzle` `^7.4.5`
   (proxies, TLS, strips `Authorization` on cross-origin redirects), `symfony/console` and `symfony/process`
   `^5.4 || ^6.4 || ^7.0`. Code must work with the lowest and highest of each (CI: `--prefer-lowest`).
-  No other runtime dependency may be added.
+  No other runtime dependency may be added. `composer-runtime-api` `^2.0` is a platform requirement, not a library:
+  `PackageVersion` reads the installed version from `Composer\InstalledVersions`, and the PHAR build writes the
+  release version into the bundled Composer metadata, so there is no version constant to keep in sync.
 - Shipped as a Composer package and as a self-contained PHAR (`dist/patchline.phar`, built with Box) that runs
   before or without `composer install`.
 - Needs a `patch(1)` binary for detection and `verify` (GNU patch on Linux, Apple's patch on macOS).
