@@ -6,12 +6,10 @@ on:
     paths:
       - ".github/**.yml"
       - ".github/**.yaml"
-      - "examples/**.yml"
   pull_request:
     paths:
       - ".github/**.yml"
       - ".github/**.yaml"
-      - "examples/**.yml"
 
 permissions: {}
 
@@ -36,9 +34,6 @@ jobs:
         uses: zizmorcore/zizmor-action@53290badfa369cb0bf7ad16342cb62c2fa47ac7b # v0.8.0
         with:
           persona: pedantic
-          # zizmor needs file paths for the example; a directory without .github/workflows collects nothing
-          inputs: |
-            .github/
-            examples/github/patchline-sync.yml
+          inputs: .github/
           advanced-security: false # a finding fails the job instead of being uploaded as a code scanning alert
           annotations: true

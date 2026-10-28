@@ -73,6 +73,21 @@ final class ReadmeTest extends TestCase
         self::assertSame($rows[1], $codes[1]);
     }
 
+    public function test_the_recommended_wiring_runs_rewind_before_ece_patches_apply(): void
+    {
+        $section = $this->section($this->readme(), 'Recommended wiring');
+
+        preg_match('/```json\n(.*?)```/s', $section, $block);
+        $scripts = json_decode('{' . ($block[1] ?? '') . '}', true);
+
+        self::assertIsArray($scripts);
+        self::assertIsArray($scripts['scripts']);
+        self::assertSame(
+            ['vendor/bin/patchline rewind', 'vendor/bin/ece-patches apply'],
+            $scripts['scripts']['apply-patches'],
+        );
+    }
+
     private function readme(): string
     {
         $path = self::ROOT . '/README.md';

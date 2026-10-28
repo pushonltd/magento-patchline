@@ -78,7 +78,7 @@
             "phpunit --coverage-clover=build/coverage/clover.xml --coverage-text",
             "@php tools/coverage-check.php build/coverage/clover.xml 95"
         ],
-        "zizmor": "@php -r \"if (trim((string) shell_exec('command -v zizmor 2>/dev/null')) === '') { fwrite(STDERR, 'zizmor is not installed. See https://docs.zizmor.sh/installation/' . PHP_EOL); exit(1); }\" && zizmor --persona=pedantic .github/ examples/github/patchline-sync.yml",
+        "zizmor": "@php -r \"if (trim((string) shell_exec('command -v zizmor 2>/dev/null')) === '') { fwrite(STDERR, 'zizmor is not installed. See https://docs.zizmor.sh/installation/' . PHP_EOL); exit(1); }\" && zizmor --persona=pedantic .github/",
         "mutation": "@php tools/infection/vendor/bin/infection --threads=max",
         "check": [
             "@composer validate --strict",

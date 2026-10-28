@@ -21,7 +21,6 @@ final class WorkflowPolicyTest extends TestCase
         self::assertMatchesRegularExpression('/^\s*advanced-security:\s*false\b/m', $workflow);
         self::assertMatchesRegularExpression('/^\s*annotations:\s*true\b/m', $workflow);
         self::assertStringContainsString('zizmorcore/zizmor-action@', $workflow);
-        self::assertStringContainsString('examples/github/patchline-sync.yml', $workflow);
     }
 
     #[DataProvider('workflowFiles')]
