@@ -2,10 +2,14 @@
 
 [![CI](https://github.com/pushonltd/magento-patchline/actions/workflows/ci.yml/badge.svg)](https://github.com/pushonltd/magento-patchline/actions/workflows/ci.yml)
 
-A companion to Adobe's Quality Patches Tool for Magento Open Source.
+A companion to [`magento/quality-patches`](https://github.com/magento/quality-patches) for Magento Open Source.
 
-Since `magento/magento-cloud-patches` 1.1.18, Adobe's monthly security patches no longer reach Open Source through
-that package. Patchline downloads them into `m2-hotfixes/`. `ece-patches apply` still does the patching.
+**It checks your store for Adobe's isolated security patches and applies the missing ones automatically.**
+`patchline sync` downloads them into `m2-hotfixes/`.
+With the [recommended wiring](#recommended-wiring), `ece-patches apply` puts them in on every `composer install`.
+
+Since `magento/magento-cloud-patches` 1.1.18, these patches no longer reach Open Source through that package.
+Patchline fills that gap.
 
 ## Quick start
 
