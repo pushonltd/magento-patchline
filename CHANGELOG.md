@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.0.1] - 2026-10-28
+
 ### Added
 
 - `patchline status`: reports which of Adobe's isolated security patches are applied, queued, missing or need an
@@ -19,3 +21,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `--cross-check` against Adobe's `vendor/bin/patch-status`.
 - Configuration through flags, `PATCHLINE_*` environment variables and `extra.patchline` in `composer.json`.
 - Self-contained `patchline.phar` with a checksum.
+
+[Unreleased]: https://github.com/pushonltd/magento-patchline/compare/v0.0.1...HEAD
+[0.0.1]: https://github.com/pushonltd/magento-patchline/releases/tag/v0.0.1
