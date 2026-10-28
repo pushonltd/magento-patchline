@@ -204,6 +204,17 @@ final class ApplicationTest extends TestCase
         self::assertSame('', $result['stderr']);
     }
 
+    public function test_it_shows_the_banner_and_version_above_the_command_list(): void
+    {
+        $result = $this->runWithoutStore(['list']);
+
+        self::assertSame(0, $result['exitCode']);
+        self::assertStringStartsWith("pushonltd/\n", $result['stdout']);
+        self::assertStringContainsString("| .__/ \\__,_|\\__\\___|_| |_|_|_|_| |_|\\___|\n", $result['stdout']);
+        self::assertStringContainsString('patchline ' . PackageVersion::current() . "\n", $result['stdout']);
+        self::assertStringContainsString('Available commands:', $result['stdout']);
+    }
+
     public function test_it_prints_the_package_version_and_exits_0_for_version(): void
     {
         $result = $this->runWithoutStore(['--version']);

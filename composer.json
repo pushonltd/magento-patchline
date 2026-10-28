@@ -16,6 +16,10 @@
         {
             "name": "PushON Ltd",
             "homepage": "https://www.pushon.co.uk/"
+        },
+        {
+            "name": "Jiří Brada",
+            "homepage": "https://github.com/jbrada"
         }
     ],
     "support": {
@@ -27,6 +31,7 @@
     ],
     "require": {
         "php": ">=8.2",
+        "composer-runtime-api": "^2.0",
         "ext-hash": "*",
         "ext-json": "*",
         "ext-openssl": "*",

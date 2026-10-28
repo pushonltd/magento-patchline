@@ -8,10 +8,20 @@ use Symfony\Component\Console\Application;
 
 /**
  * The Symfony Console application, configured the way patchline runs it: exceptions are mapped to exit codes
- * by the caller, and --version prints "patchline <version>".
+ * by the caller, and --version prints "patchline <version>". The command list starts with the banner.
  */
 final class ConsoleApplication extends Application
 {
+    private const BANNER = <<<'TXT'
+        pushonltd/
+                     _       _     _ _
+         _ __   __ _| |_ ___| |__ | (_)_ __   ___
+        | '_ \ / _` | __/ __| '_ \| | | '_ \ / _ \
+        | |_) | (_| | || (__| | | | | | | | |  __/
+        | .__/ \__,_|\__\___|_| |_|_|_|_| |_|\___|
+        |_|
+        TXT;
+
     /**
      * @param list<\Symfony\Component\Console\Command\Command> $commands
      */
@@ -25,6 +35,11 @@ final class ConsoleApplication extends Application
     public function getLongVersion(): string
     {
         return 'patchline ' . $this->packageVersion;
+    }
+
+    public function getHelp(): string
+    {
+        return self::BANNER . "\n\n" . $this->getLongVersion();
     }
 
     /**
