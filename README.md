@@ -1,15 +1,37 @@
-# Patchline
+<div align="center">
+
+<pre>
+pushonltd/
+             _       _     _ _
+ _ __   __ _| |_ ___| |__ | (_)_ __   ___
+| '_ \ / _` | __/ __| '_ \| | | '_ \ / _ \
+| |_) | (_| | || (__| | | | | | | | |  __/
+| .__/ \__,_|\__\___|_| |_|_|_|_| |_|\___|
+|_|
+</pre>
+
+**Adobe's isolated security patches for Magento Open Source.<br>Checked, downloaded and applied on every deploy.**
 
 [![CI](https://github.com/pushonltd/magento-patchline/actions/workflows/ci.yml/badge.svg)](https://github.com/pushonltd/magento-patchline/actions/workflows/ci.yml)
+[![Packagist](https://img.shields.io/packagist/v/pushonltd/magento-patchline)](https://packagist.org/packages/pushonltd/magento-patchline)
+[![PHP](https://img.shields.io/packagist/dependency-v/pushonltd/magento-patchline/php)](composer.json)
+[![License](https://img.shields.io/packagist/l/pushonltd/magento-patchline)](LICENSE)
 
-A companion to [`magento/quality-patches`](https://github.com/magento/quality-patches) for Magento Open Source.
+[Quick start](#quick-start) ·
+[Recommended wiring](#recommended-wiring) ·
+[Where the patches come from](#where-the-patches-come-from) ·
+[Commands](#commands)
 
-**It checks your store for Adobe's isolated security patches and applies the missing ones automatically.**
+</div>
+
+---
+
+A companion to [`magento/quality-patches`](https://github.com/magento/quality-patches).
+
+Since `magento/magento-cloud-patches` 1.1.18, Adobe's monthly security patches no longer reach Open Source through
+that package. **Patchline checks your store for them and applies the missing ones automatically.**
 `patchline sync` downloads them into `m2-hotfixes/`.
 With the [recommended wiring](#recommended-wiring), `ece-patches apply` puts them in on every `composer install`.
-
-Since `magento/magento-cloud-patches` 1.1.18, these patches no longer reach Open Source through that package.
-Patchline fills that gap.
 
 ## Quick start
 
@@ -199,6 +221,11 @@ composer check      # code style, PHPStan level 10, tests
 composer build      # dist/patchline.phar
 composer mutation   # mutation tests
 ```
+
+## Authors
+
+- [PushON Ltd](https://www.pushon.co.uk/)
+- Jiří Brada ([@jbrada](https://github.com/jbrada))
 
 ## License
 
