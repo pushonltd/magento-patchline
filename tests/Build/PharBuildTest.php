@@ -13,7 +13,7 @@ use RecursiveIteratorIterator;
 use SplFileInfo;
 
 /**
- * Builds the PHAR once (version "v9.9.9-test", so the stripped "v" is covered too) and inspects the result.
+ * Builds the PHAR once (version "v9.9.9-RC1", so the stripped "v" is covered too) and inspects the result.
  */
 #[CoversNothing]
 final class PharBuildTest extends TestCase
@@ -24,7 +24,7 @@ final class PharBuildTest extends TestCase
     {
         self::$output = TempDirectory::create();
         $build = PhpProcess::run([
-            dirname(__DIR__, 2) . '/build/build.php', '--version=v9.9.9-test', '--output=' . self::$output->path(),
+            dirname(__DIR__, 2) . '/build/build.php', '--version=v9.9.9-RC1', '--output=' . self::$output->path(),
         ]);
         self::assertSame(0, $build['exitCode'], $build['stdout'] . $build['stderr']);
     }
@@ -43,14 +43,14 @@ final class PharBuildTest extends TestCase
         $isolated->remove();
 
         self::assertSame(0, $result['exitCode'], $result['stderr']);
-        self::assertSame("patchline 9.9.9-test\n", $result['stdout']);
+        self::assertSame("patchline 9.9.9-RC1\n", $result['stdout']);
     }
 
     public function test_it_embeds_the_version_given_to_the_build_without_a_leading_v(): void
     {
         $result = PhpProcess::run([self::$output->path('patchline.phar'), '--version']);
 
-        self::assertSame("patchline 9.9.9-test\n", $result['stdout']);
+        self::assertSame("patchline 9.9.9-RC1\n", $result['stdout']);
     }
 
     public function test_it_ships_only_runtime_dependencies_and_no_tests(): void

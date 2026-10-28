@@ -20,14 +20,19 @@ final class PharBuild
     {
     }
 
+    /**
+     * A release tag loses its "v". Anything Composer would not accept as a version (a `git describe` result such as
+     * `0.0.1-5-gabc1234`) becomes a `dev-` version, because Composer validates the version in composer.json.
+     */
     public static function normaliseVersion(string $version): string
     {
         $version = ltrim(trim($version), 'v');
         if (preg_match('/^[0-9A-Za-z][0-9A-Za-z.+_-]*$/', $version) !== 1) {
             throw new RuntimeException(sprintf('"%s" is not a usable version string.', $version));
         }
+        $release = '/^\d+(?:\.\d+){0,3}(?:-?(?:stable|beta|b|rc|alpha|a|patch|pl|p)(?:[.-]?\d+)*)?(?:[.-]?dev)?$/i';
 
-        return $version;
+        return preg_match($release, $version) === 1 ? $version : 'dev-' . $version;
     }
 
     public function describeVersion(): string
@@ -76,12 +81,13 @@ final class PharBuild
         $this->copyTree($this->root . '/src', $stage . '/src');
         $this->copyFile($this->root . '/bin/patchline', $stage . '/bin/patchline');
         $this->copyFile($this->root . '/box.json.dist', $stage . '/box.json');
-        $this->write($stage . '/composer.json', $this->runtimeComposerJson());
-        $versionFile = $stage . '/src/PackageVersion.php';
-        $this->write($versionFile, $this->withVersion($versionFile, $version));
+        $this->write($stage . '/composer.json', $this->runtimeComposerJson($version));
     }
 
-    private function runtimeComposerJson(): string
+    /**
+     * The version goes into Composer's metadata, where PackageVersion reads it at runtime.
+     */
+    private function runtimeComposerJson(string $version): string
     {
         $contents = file_get_contents($this->root . '/composer.json');
         $composer = is_string($contents) ? json_decode($contents, true) : null;
@@ -91,23 +97,11 @@ final class PharBuild
 
         return json_encode([
             'name' => $composer['name'] ?? 'pushonltd/magento-patchline',
+            'version' => $version,
             'require' => $composer['require'],
             'autoload' => $composer['autoload'],
             'config' => ['sort-packages' => true, 'platform' => ['php' => '8.2.0']],
         ], JSON_THROW_ON_ERROR | JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
-    }
-
-    private function withVersion(string $file, string $version): string
-    {
-        $code = file_get_contents($file);
-        $stamped = is_string($code)
-            ? preg_replace("/(const VERSION = )'[^']*';/", "\${1}'" . $version . "';", $code, 1, $count)
-            : null;
-        if ($stamped === null || $count !== 1) {
-            throw new RuntimeException($file . ' has no single-line VERSION constant to replace.');
-        }
-
-        return $stamped;
     }
 
     private function publish(string $phar, string $outputDirectory): string
