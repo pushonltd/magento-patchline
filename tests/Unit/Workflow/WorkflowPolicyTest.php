@@ -133,7 +133,7 @@ final class WorkflowPolicyTest extends TestCase
         self::assertMatchesRegularExpression('/^permissions:\s*\{\}\s*$/m', $this->read($file));
     }
 
-    public function test_the_test_matrix_covers_php_8_2_to_8_5_and_macos(): void
+    public function test_the_test_matrix_covers_php_8_2_to_8_5_on_linux_only(): void
     {
         $ci = $this->read('.github/workflows/ci.yml');
 
@@ -141,7 +141,7 @@ final class WorkflowPolicyTest extends TestCase
             self::assertMatchesRegularExpression('/php:\s*\[[^\]]*"' . preg_quote($version, '/') . '"/', $ci);
         }
         self::assertMatchesRegularExpression('/os:\s*\[ubuntu-latest\]/', $ci);
-        self::assertMatchesRegularExpression('/os:\s*macos-latest\s*\n\s*php:\s*"8\.5"/', $ci);
+        self::assertStringNotContainsString('macos', $ci);
     }
 
     public function test_the_test_matrix_includes_a_prefer_lowest_run_on_php_8_2(): void
