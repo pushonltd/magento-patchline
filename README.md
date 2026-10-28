@@ -51,6 +51,9 @@ and downloads each diff from `repo.magento.com/patch/`.
 Every file is checked against the sha256 in the registry.
 It is the same registry Adobe's own `vendor/bin/patch-status` reads.
 
+Credit for finding this endpoint goes to [@s-renz](https://github.com/s-renz).
+We had a great chat about it at MM DE 26, and this tool started there.
+
 **There is no third party in between.** No mirror, no hosted service, no patches of ours.
 That is deliberate. A security patch should come from the vendor who wrote it, and you should be able to check that it did.
 
