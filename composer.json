@@ -31,7 +31,7 @@
         "ext-json": "*",
         "ext-openssl": "*",
         "composer/semver": "^3.2",
-        "guzzlehttp/guzzle": "^7.4.5",
+        "guzzlehttp/guzzle": "^7.4.5 || ^8.0.0",
         "symfony/console": "^5.4 || ^6.4 || ^7.0",
         "symfony/process": "^5.4 || ^6.4 || ^7.0"
     },
