@@ -8,27 +8,20 @@ use Patchline\Tests\Double\TempDirectory;
 use Patchline\Tests\Support\CliStore;
 use Patchline\Tests\Support\PhpProcess;
 use PHPUnit\Framework\Attributes\CoversNothing;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 
 /**
- * Exercises bin/patchline itself, from a copy placed in a throwaway project layout.
+ * Exercises bin/patchline itself, from a copy placed in a throwaway project layout. The PHAR has its own bootstrap,
+ * so `composer test:cli:phar` excludes this group.
  */
 #[CoversNothing]
+#[Group('bin-source')]
 final class BinBootstrapTest extends TestCase
 {
     private ?TempDirectory $project = null;
 
     private ?CliStore $store = null;
-
-    protected function setUp(): void
-    {
-        $override = getenv('PATCHLINE_BIN');
-        if ($override === false || $override === '') {
-            return;
-        }
-
-        self::markTestSkipped('bin/patchline is not the binary under test.');
-    }
 
     protected function tearDown(): void
     {

@@ -6,7 +6,7 @@
 |---|---|---|---|
 | Unit | `tests/Unit` | Pure logic and classes with test doubles. No network, no real `patch`, no files outside a temp dir. | `composer test:unit` |
 | Integration | `tests/Integration` | Real `patch` binary, real filesystem, local HTTP server (`php -S`) serving a fixture registry and diffs. | `composer test:integration` |
-| CLI | `tests/Cli` | Runs `bin/patchline` (or `dist/patchline` when `PATCHLINE_BIN` is set) as a process against fixture stores; asserts stdout, stderr, exit code. | `composer test:cli` |
+| CLI | `tests/Cli` | Runs `bin/patchline` (or the PHAR when `PATCHLINE_BIN=dist/patchline.phar`) as a process against fixture stores; asserts stdout, stderr, exit code. | `composer test:cli` (`composer test:cli:phar` against the PHAR) |
 
 `composer test` runs all three. PHPUnit `^10.5 || ^11.5 || ^12.4` — test code must run on all three: use
 attributes only (`#[CoversClass]`, `#[DataProvider]`, `#[Group]`), never doc-comment annotations, and no
@@ -31,6 +31,9 @@ Pure domain code (`Version`, `Registry`, `Analysis`, `Sync\Planner`, `Detection\
 expected to reach 100 % line coverage; the gap to 95 % is for `Cli` bootstrapping and OS error paths.
 
 ## Test style
+
+- Tests never skip themselves (`markTestSkipped` is banned by a policy test): a test a job cannot run goes into a
+  `#[Group]` that the job excludes, so every run reports exactly what it checked.
 
 - One behaviour per test, named after the requirement. Arrange / act / assert, visibly separated.
 - Assert on outcomes (return values, files on disk, output, exit codes), not on which private methods ran.

@@ -255,7 +255,7 @@ jobs:
       - name: Run the CLI suite against the PHAR
         env:
           PATCHLINE_BIN: dist/patchline.phar
-        run: composer test:cli
+        run: composer test:cli:phar
 
       - name: Run the PHAR build tests
         run: vendor/bin/phpunit -c tests/Build/phpunit.xml
@@ -303,4 +303,4 @@ jobs:
       - name: Run the CLI suite against the PHAR
         env:
           PATCHLINE_BIN: dist/patchline.phar
-        run: composer test:cli
+        run: composer test:cli:phar

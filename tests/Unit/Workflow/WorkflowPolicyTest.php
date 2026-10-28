@@ -13,28 +13,6 @@ final class WorkflowPolicyTest extends TestCase
 {
     private const ROOT = __DIR__ . '/../../..';
 
-    public function test_zizmor_reports_no_findings_for_the_workflows_with_the_pedantic_persona(): void
-    {
-        $zizmor = trim((string) shell_exec('command -v zizmor 2>/dev/null'));
-        if ($zizmor === '') {
-            self::markTestSkipped('zizmor is not installed; the CI zizmor workflow covers .github/.');
-        }
-
-        $output = [];
-        exec(
-            sprintf(
-                'cd %s && %s --persona=pedantic --offline --no-progress'
-                . ' .github/ examples/github/patchline-sync.yml 2>&1',
-                escapeshellarg(self::ROOT),
-                escapeshellarg($zizmor),
-            ),
-            $output,
-            $exitCode,
-        );
-
-        self::assertSame(0, $exitCode, implode("\n", $output));
-    }
-
     public function test_the_zizmor_workflow_fails_the_build_on_any_finding(): void
     {
         $workflow = $this->read('.github/workflows/zizmor.yml');
@@ -199,7 +177,7 @@ final class WorkflowPolicyTest extends TestCase
 
         self::assertMatchesRegularExpression('/run:\s*composer build\s*$/m', $ci);
         self::assertMatchesRegularExpression('/PATCHLINE_BIN:\s*dist\/patchline\.phar\b/', $ci);
-        self::assertMatchesRegularExpression('/run:\s*composer test:cli\s*$/m', $ci);
+        self::assertSame(2, preg_match_all('/run:\s*composer test:cli:phar\s*$/m', $ci));
         self::assertMatchesRegularExpression('/composer (update|install) [^\n]*--working-dir=tools\/box/', $ci);
         self::assertStringContainsString('-c tests/Build/phpunit.xml', $ci);
     }
@@ -227,6 +205,41 @@ final class WorkflowPolicyTest extends TestCase
         );
         self::assertMatchesRegularExpression('/--version="\$\{?RELEASE_TAG\}?"/', $release);
         self::assertMatchesRegularExpression('/PATCHLINE_BIN:\s*dist\/patchline\.phar\b/', $release);
+        self::assertMatchesRegularExpression('/run:\s*composer test:cli:phar\s*$/m', $release);
+    }
+
+    public function test_the_phar_cli_suite_excludes_only_the_tests_of_bin_patchline_itself(): void
+    {
+        self::assertMatchesRegularExpression(
+            '/"test:cli:phar":\s*"phpunit --testsuite=cli --exclude-group=bin-source"/',
+            $this->read('composer.json'),
+        );
+    }
+
+    public function test_no_test_skips_itself(): void
+    {
+        $offenders = [];
+        $tests = new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator(self::ROOT . '/tests'));
+        foreach ($tests as $file) {
+            if (
+                !$file instanceof \SplFileInfo
+                || $file->getExtension() !== 'php'
+                || str_contains($file->getPathname(), '/Fixtures/')
+            ) {
+                continue;
+            }
+            if (!str_contains((string) file_get_contents($file->getPathname()), 'markTest' . 'Skipped(')) {
+                continue;
+            }
+
+            $offenders[] = $file->getFilename();
+        }
+
+        self::assertSame(
+            [],
+            $offenders,
+            'A skipped test looks green; exclude it with a group in the job that cannot run it.',
+        );
     }
 
     /**

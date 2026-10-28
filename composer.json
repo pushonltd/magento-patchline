@@ -73,6 +73,7 @@
         "test:unit": "phpunit --testsuite=unit",
         "test:integration": "phpunit --testsuite=integration",
         "test:cli": "phpunit --testsuite=cli",
+        "test:cli:phar": "phpunit --testsuite=cli --exclude-group=bin-source",
         "test:coverage": [
             "phpunit --coverage-clover=build/coverage/clover.xml --coverage-text",
             "@php tools/coverage-check.php build/coverage/clover.xml 95"

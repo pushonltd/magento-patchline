@@ -14,27 +14,6 @@ final class ExamplesTest extends TestCase
 {
     private const ROOT = __DIR__ . '/../../..';
 
-    public function test_the_github_example_passes_zizmor_with_the_pedantic_persona(): void
-    {
-        $zizmor = trim((string) shell_exec('command -v zizmor 2>/dev/null'));
-        if ($zizmor === '') {
-            self::markTestSkipped('zizmor is not installed; the CI zizmor job covers examples/.');
-        }
-
-        $output = [];
-        exec(
-            sprintf(
-                '%s --persona=pedantic --offline --no-progress %s 2>&1',
-                escapeshellarg($zizmor),
-                escapeshellarg($this->path('examples/github/patchline-sync.yml')),
-            ),
-            $output,
-            $exitCode,
-        );
-
-        self::assertSame(0, $exitCode, implode("\n", $output));
-    }
-
     public function test_the_github_example_pins_every_action_to_a_full_commit_sha(): void
     {
         $workflow = $this->read('examples/github/patchline-sync.yml');
