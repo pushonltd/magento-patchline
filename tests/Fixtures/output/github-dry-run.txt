@@ -1,0 +1,11 @@
+::warning::249-QUEUED-CE: Diff fetched from cache.
+::warning::249-QUEUED-CE: Second warning.
+::error title=duplicate::249-DUPLICATE-CE is queued more than once. Run patchline sync --prune to remove the extra copies.
+::error title=misordered::249-MISORDERED-CE is queued before a patch it requires. Run patchline sync --adopt to fix the file names.
+::error title=missing::249-MISSING-CE is not applied and not queued. Run patchline sync to download it.
+::warning title=entitled::249-ENTITLED-CE needs an entitlement this store lacks; patchline does not install it.
+::warning title=unknown::249-UNKNOWN-CE could not be checked against the installed code.
+::warning::Registry is older than one hour.
+::warning::Ignoring m2-hotfixes/notes.txt.
+::notice title=cross-check::Adobe patch-status agrees with Patchline.
+::notice::Summary: 1 applied, 1 queued, 1 duplicate, 1 misordered, 1 missing, 1 entitled, 1 unknown, 1 not_applicable

@@ -1,0 +1,44 @@
+name: zizmor
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - ".github/**.yml"
+      - ".github/**.yaml"
+      - "examples/**.yml"
+  pull_request:
+    paths:
+      - ".github/**.yml"
+      - ".github/**.yaml"
+      - "examples/**.yml"
+
+permissions: {}
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  zizmor:
+    name: Audit workflows
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read # check out the repository to read the workflow files
+    steps:
+      - name: Check out the repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Run zizmor
+        uses: zizmorcore/zizmor-action@53290badfa369cb0bf7ad16342cb62c2fa47ac7b # v0.8.0
+        with:
+          persona: pedantic
+          # zizmor needs file paths for the example; a directory without .github/workflows collects nothing
+          inputs: |
+            .github/
+            examples/github/patchline-sync.yml
+          advanced-security: false # a finding fails the job instead of being uploaded as a code scanning alert
+          annotations: true

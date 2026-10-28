@@ -1,0 +1,6 @@
+{
+    "name": "acme/replaced-package",
+    "replace": {
+        "magento/module-replaced": "*"
+    }
+}

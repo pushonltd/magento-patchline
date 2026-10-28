@@ -1,0 +1,49 @@
+# Include from your .gitlab-ci.yml:
+#
+#   include:
+#     - local: examples/gitlab/.gitlab-ci.patchline.yml
+#
+# Assumes the stage "test" exists and COMPOSER_AUTH is a masked CI/CD variable if you need it.
+
+.patchline:
+  image: composer:2
+  variables:
+    COMPOSER_CACHE_DIR: "$CI_PROJECT_DIR/.composer-cache"
+  cache:
+    key: patchline
+    paths:
+      - .composer-cache/
+      - var/patch_metadata/
+  before_script:
+    - composer install --no-scripts --no-interaction --prefer-dist
+
+# Runs on every pipeline: fails when a patch is missing, duplicated or queued in the wrong order.
+patchline:status:
+  extends: .patchline
+  stage: test
+  script:
+    - vendor/bin/patchline status --format=junit > patchline.xml
+  artifacts:
+    when: always
+    reports:
+      junit: patchline.xml
+
+# Scheduled job (CI/CD > Schedules, for example weekly): downloads new patches and pushes a branch.
+# Needs a project access token with write_repository in the variable PATCHLINE_PUSH_TOKEN.
+patchline:sync:
+  extends: .patchline
+  stage: test
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "schedule"
+  script:
+    - vendor/bin/patchline sync --adopt --prune
+    - vendor/bin/patchline verify
+    - |
+      if [ -n "$(git status --porcelain m2-hotfixes)" ]; then
+        git config user.name "patchline"
+        git config user.email "patchline@example.com"
+        git checkout -b patchline/sync
+        git add m2-hotfixes
+        git commit -m "chore(patches): sync Adobe security patches"
+        git push "https://patchline:${PATCHLINE_PUSH_TOKEN}@${CI_SERVER_HOST}/${CI_PROJECT_PATH}.git" patchline/sync
+      fi

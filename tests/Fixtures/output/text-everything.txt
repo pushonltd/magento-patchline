@@ -1,0 +1,50 @@
+Adobe Commerce 2.4.9
+Registry: remote
+Components: CE 2.4.9, EE 2.4.9
+
+2026-10-01  CE  249-APPLIED-CE        applied         1 CVE
+2026-10-02  CE  249-QUEUED-CE         queued          m2-hotfixes/2026-10-13_249-Q-CE.patch  1 CVE
+2026-10-03  CE  249-DUPLICATE-CE      duplicate       m2-hotfixes/2026-10-13_249-Q-CE.patch, m2-hotfixes/copy.patch  1 CVE
+2026-10-04  CE  249-MISORDERED-CE     misordered      1 CVE
+2026-10-05  CE  249-MISSING-CE        missing         1 CVE
+2026-10-06  CE  249-ENTITLED-CE       entitled        1 CVE
+2026-10-07  CE  249-UNKNOWN-CE        unknown         1 CVE
+2026-10-08  CE  249-NOTAPPLICABLE-CE  not_applicable  1 CVE
+
+Sync
+  [done] download 249-2026-10-001-CE to m2-hotfixes/a.patch
+    downloaded
+  [failed] download 249-2026-10-001-CE to m2-hotfixes/b.patch
+    HTTP 500
+  [skipped] rename m2-hotfixes/c.patch to m2-hotfixes/d.patch
+    target exists
+  [done] remove m2-hotfixes/e.patch
+  [warning] Check the order.
+  [warning] Check, again | now.
+
+Verify (replay of the patch queue)
+  1. m2-hotfixes/a.patch: would apply
+  2. m2-hotfixes/b.patch: already applied
+  3. m2-hotfixes/c.patch: already applied (ignoring vendor/bin/patch-status)
+  4. m2-hotfixes/d.patch: skipped: target module(s) are not installed
+  5. m2-hotfixes/e.patch: would fail
+  Patch output for m2-hotfixes/e.patch:
+    patching file x.php
+    Hunk #1 FAILED at 3.
+    100% & <broken>
+  Note: patch 2.8 uses fuzz.
+Verify failed: ece-patches apply would stop at m2-hotfixes/e.patch.
+
+Cross-check with Adobe patch-status
+  2 disagreements:
+  - 249-X-CE: Patchline detects applied, Adobe patch-status reports unknown.
+  - 249-Y-CE: Patchline detects not_applied, Adobe patch-status reports not_listed.
+
+Warnings
+  - Registry is older than one hour.
+  - Ignoring m2-hotfixes/notes.txt.
+  - 249-QUEUED-CE: Diff fetched from cache.
+  - 249-QUEUED-CE: Second warning.
+
+Summary: 1 applied, 1 queued, 1 duplicate, 1 misordered, 1 missing, 1 entitled, 1 unknown, 1 not_applicable
+Next: run patchline sync to download the missing patches.

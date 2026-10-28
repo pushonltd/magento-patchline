@@ -1,0 +1,11 @@
+{
+  "$schema": "vendor/infection/infection/resources/schema.json",
+  "source": {"directories": ["src"]},
+  "logs": {"text": "build/infection/infection.log"},
+  "minMsi": 85,
+  "minCoveredMsi": 90,
+  "phpUnit": {"configDir": "."},
+  // The CLI suite starts bin/patchline as a process and is too slow for mutation runs; the same scenarios run
+  // in-process in tests/Integration/Cli.
+  "testFrameworkOptions": "--testsuite=unit,integration"
+}

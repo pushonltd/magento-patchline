@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- The PHAR build tests: they run Composer and Box (network), so they are not part of `composer test`.
+     Run them with: vendor/bin/phpunit -c tests/Build/phpunit.xml -->
+<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:noNamespaceSchemaLocation="../../vendor/phpunit/phpunit/phpunit.xsd"
+         bootstrap="../../vendor/autoload.php"
+         cacheDirectory="../../.phpunit.cache"
+         colors="true"
+         executionOrder="random"
+         failOnRisky="true"
+         failOnWarning="true"
+         failOnDeprecation="true"
+         failOnNotice="true"
+         beStrictAboutOutputDuringTests="true"
+         beStrictAboutCoverageMetadata="true">
+    <testsuites>
+        <testsuite name="build"><directory>.</directory></testsuite>
+    </testsuites>
+</phpunit>

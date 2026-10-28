@@ -1,0 +1,9 @@
+{
+    "scripts": {
+        "post-install-cmd": [
+            "patchline status --fail-on=missing,duplicate",
+            "@apply-patches"
+        ],
+        "apply-patches": "ece-patches apply"
+    }
+}

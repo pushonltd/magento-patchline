@@ -1,0 +1,89 @@
+{
+    "name": "pushonltd/magento-patchline",
+    "description": "Checks and syncs Adobe's isolated security patches for a Magento store.",
+    "keywords": [
+        "magento",
+        "adobe-commerce",
+        "security",
+        "patches",
+        "ece-patches",
+        "cloud-patches"
+    ],
+    "homepage": "https://github.com/pushonltd/magento-patchline",
+    "type": "library",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "PushON Ltd",
+            "homepage": "https://www.pushon.co.uk/"
+        }
+    ],
+    "support": {
+        "issues": "https://github.com/pushonltd/magento-patchline/issues",
+        "source": "https://github.com/pushonltd/magento-patchline"
+    },
+    "bin": [
+        "bin/patchline"
+    ],
+    "require": {
+        "php": ">=8.1",
+        "ext-hash": "*",
+        "ext-json": "*",
+        "ext-openssl": "*",
+        "composer/semver": "^1.5 || ^3.2",
+        "guzzlehttp/guzzle": "^7.4.5",
+        "symfony/console": "^4.4 || ^5.4 || ^6.4 || ^7.0",
+        "symfony/process": "^4.4 || ^5.4 || ^6.4 || ^7.0"
+    },
+    "require-dev": {
+        "dealerdirect/phpcodesniffer-composer-installer": "*",
+        "phpstan/extension-installer": "*",
+        "phpstan/phpstan": "^2",
+        "phpstan/phpstan-deprecation-rules": "*",
+        "phpstan/phpstan-phpunit": "*",
+        "phpstan/phpstan-strict-rules": "*",
+        "phpunit/phpunit": "^10.5 || ^11.5 || ^12.4",
+        "slevomat/coding-standard": "*",
+        "squizlabs/php_codesniffer": "*"
+    },
+    "autoload": {
+        "psr-4": {
+            "Patchline\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Patchline\\Build\\": "build/",
+            "Patchline\\Tests\\": "tests/"
+        }
+    },
+    "config": {
+        "sort-packages": true,
+        "allow-plugins": {
+            "phpstan/extension-installer": true,
+            "dealerdirect/phpcodesniffer-composer-installer": true
+        }
+    },
+    "scripts": {
+        "cs": "phpcs",
+        "cs-fix": "phpcbf",
+        "analyse": "phpstan analyse --memory-limit=1G",
+        "build": "@php build/build.php",
+        "test": "phpunit",
+        "test:unit": "phpunit --testsuite=unit",
+        "test:integration": "phpunit --testsuite=integration",
+        "test:cli": "phpunit --testsuite=cli",
+        "test:coverage": [
+            "phpunit --coverage-clover=build/coverage/clover.xml --coverage-text",
+            "@php tools/coverage-check.php build/coverage/clover.xml 95"
+        ],
+        "zizmor": "@php -r \"if (trim((string) shell_exec('command -v zizmor 2>/dev/null')) === '') { fwrite(STDERR, 'zizmor is not installed. See https://docs.zizmor.sh/installation/' . PHP_EOL); exit(1); }\" && zizmor --persona=pedantic .github/ examples/github/patchline-sync.yml",
+        "mutation": "@php tools/infection/vendor/bin/infection --threads=max",
+        "check": [
+            "@composer validate --strict",
+            "@cs",
+            "@analyse",
+            "@php tools/run-tests.php"
+        ]
+    }
+}

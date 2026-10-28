@@ -1,0 +1,45 @@
+version: 2
+updates:
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    cooldown:
+      default-days: 7 # do not pick up a freshly published, possibly compromised release the same day
+    groups:
+      actions:
+        patterns:
+          - "*"
+
+  - package-ecosystem: "composer"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    cooldown:
+      default-days: 7 # same reasoning as for actions
+    groups:
+      composer:
+        patterns:
+          - "*"
+
+  - package-ecosystem: "composer"
+    directory: "/tools/box"
+    schedule:
+      interval: "weekly"
+    cooldown:
+      default-days: 7 # same reasoning as for actions
+    groups:
+      box:
+        patterns:
+          - "*"
+
+  - package-ecosystem: "composer"
+    directory: "/tools/infection"
+    schedule:
+      interval: "weekly"
+    cooldown:
+      default-days: 7 # same reasoning as for actions
+    groups:
+      infection:
+        patterns:
+          - "*"

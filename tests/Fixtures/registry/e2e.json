@@ -1,0 +1,71 @@
+{
+    "_schema": {
+        "version": "1.0",
+        "patch_base_url": "http://127.0.0.1:{port}/patch"
+    },
+    "_areas": {
+        "CE": {
+            "description": "Community",
+            "detection": "base_version"
+        }
+    },
+    "patches": {
+        "249-2026-01-001-CE": {
+            "applies_to": [
+                "2.4.9"
+            ],
+            "area": "CE",
+            "requires": [],
+            "cves": [
+                "CVE-2026-1065"
+            ],
+            "released": "2026-01-13",
+            "file_name": "249-2026-01-001-CE.diff",
+            "sha256": "COMPUTED"
+        },
+        "249-2026-02-001-CE": {
+            "applies_to": [
+                "2.4.9"
+            ],
+            "area": "CE",
+            "requires": [
+                "249-2026-01-001-CE"
+            ],
+            "cves": [
+                "CVE-2026-1066"
+            ],
+            "released": "2026-02-10",
+            "file_name": "249-2026-02-001-CE.diff",
+            "sha256": "COMPUTED"
+        },
+        "249-2026-03-001-CE": {
+            "applies_to": [
+                "2.4.9"
+            ],
+            "area": "CE",
+            "requires": [],
+            "cves": [
+                "CVE-2026-1067"
+            ],
+            "released": "2026-03-10",
+            "file_name": "249-2026-03-001-CE.diff",
+            "sha256": "COMPUTED",
+            "entitlements": [
+                "ee"
+            ]
+        },
+        "249-2026-04-001-CE": {
+            "applies_to": [
+                "2.4.9"
+            ],
+            "area": "CE",
+            "requires": [],
+            "cves": [
+                "CVE-2026-1068"
+            ],
+            "released": "2026-04-14",
+            "file_name": "249-2026-04-001-CE.diff",
+            "sha256": "COMPUTED"
+        }
+    }
+}

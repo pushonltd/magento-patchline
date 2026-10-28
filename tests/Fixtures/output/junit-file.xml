@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="patchline" tests="8" failures="3" skipped="2">
+    <testcase classname="CE" name="249-APPLIED-CE"/>
+    <testcase classname="CE" name="249-QUEUED-CE"/>
+    <testcase classname="CE" name="249-DUPLICATE-CE">
+      <failure message="249-DUPLICATE-CE is queued more than once" type="duplicate"></failure>
+    </testcase>
+    <testcase classname="CE" name="249-MISORDERED-CE">
+      <failure message="249-MISORDERED-CE is queued before a patch it requires" type="misordered"></failure>
+    </testcase>
+    <testcase classname="CE" name="249-MISSING-CE">
+      <failure message="249-MISSING-CE is not applied and not queued" type="missing"></failure>
+    </testcase>
+    <testcase classname="CE" name="249-ENTITLED-CE">
+      <skipped message="entitled"/>
+    </testcase>
+    <testcase classname="CE" name="249-UNKNOWN-CE">
+      <skipped message="unknown"/>
+    </testcase>
+    <testcase classname="CE" name="249-NOTAPPLICABLE-CE"/>
+  </testsuite>
+  <testsuite name="patchline-sync" tests="0" failures="0" skipped="0">
+  </testsuite>
+  <testsuite name="patchline-verify" tests="0" failures="0" skipped="0">
+  </testsuite>
+  <testsuite name="patchline-cross-check" tests="1" failures="0" skipped="0">
+    <testcase classname="cross-check" name="patch-status"/>
+  </testsuite>
+</testsuites>

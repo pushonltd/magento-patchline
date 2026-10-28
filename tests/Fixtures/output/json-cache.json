@@ -1,0 +1,208 @@
+{
+    "schema": "patchline/report@1",
+    "base_version": "2.4.9",
+    "edition": "commerce",
+    "installed_components": {
+        "CE": "2.4.9",
+        "EE": "2.4.9"
+    },
+    "registry_source": "cache",
+    "applied_patches": [],
+    "missing_patches": [
+        "249-APPLIED-CE",
+        "249-QUEUED-CE",
+        "249-DUPLICATE-CE",
+        "249-MISORDERED-CE",
+        "249-MISSING-CE",
+        "249-ENTITLED-CE",
+        "249-UNKNOWN-CE",
+        "249-NOTAPPLICABLE-CE"
+    ],
+    "unknown_patches": [],
+    "patches": [
+        {
+            "id": "249-APPLIED-CE",
+            "area": "CE",
+            "released": "2026-10-01",
+            "state": "applied",
+            "cves": [
+                "CVE-2026-0001"
+            ],
+            "locations": [],
+            "requires": [],
+            "unmet_requirements": [],
+            "warnings": []
+        },
+        {
+            "id": "249-QUEUED-CE",
+            "area": "CE",
+            "released": "2026-10-02",
+            "state": "queued",
+            "cves": [
+                "CVE-2026-0002"
+            ],
+            "locations": [
+                "m2-hotfixes/2026-10-13_249-Q-CE.patch"
+            ],
+            "requires": [],
+            "unmet_requirements": [],
+            "warnings": [
+                "Diff fetched from cache.",
+                "Second warning."
+            ]
+        },
+        {
+            "id": "249-DUPLICATE-CE",
+            "area": "CE",
+            "released": "2026-10-03",
+            "state": "duplicate",
+            "cves": [
+                "CVE-2026-0003"
+            ],
+            "locations": [
+                "m2-hotfixes/2026-10-13_249-Q-CE.patch",
+                "m2-hotfixes/copy.patch"
+            ],
+            "requires": [],
+            "unmet_requirements": [],
+            "warnings": []
+        },
+        {
+            "id": "249-MISORDERED-CE",
+            "area": "CE",
+            "released": "2026-10-04",
+            "state": "misordered",
+            "cves": [
+                "CVE-2026-0004"
+            ],
+            "locations": [],
+            "requires": [],
+            "unmet_requirements": [],
+            "warnings": []
+        },
+        {
+            "id": "249-MISSING-CE",
+            "area": "CE",
+            "released": "2026-10-05",
+            "state": "missing",
+            "cves": [
+                "CVE-2026-0005"
+            ],
+            "locations": [],
+            "requires": [],
+            "unmet_requirements": [
+                "249-PREREQ-CE"
+            ],
+            "warnings": []
+        },
+        {
+            "id": "249-ENTITLED-CE",
+            "area": "CE",
+            "released": "2026-10-06",
+            "state": "entitled",
+            "cves": [
+                "CVE-2026-0006"
+            ],
+            "locations": [],
+            "requires": [],
+            "unmet_requirements": [],
+            "warnings": []
+        },
+        {
+            "id": "249-UNKNOWN-CE",
+            "area": "CE",
+            "released": "2026-10-07",
+            "state": "unknown",
+            "cves": [
+                "CVE-2026-0007"
+            ],
+            "locations": [],
+            "requires": [],
+            "unmet_requirements": [],
+            "warnings": []
+        },
+        {
+            "id": "249-NOTAPPLICABLE-CE",
+            "area": "CE",
+            "released": "2026-10-08",
+            "state": "not_applicable",
+            "cves": [
+                "CVE-2026-0008"
+            ],
+            "locations": [],
+            "requires": [],
+            "unmet_requirements": [],
+            "warnings": []
+        }
+    ],
+    "vulnerability_status": {
+        "CVE-2026-0001": {
+            "status": "PROTECTED",
+            "patches": [
+                "249-APPLIED-CE"
+            ]
+        },
+        "CVE-2026-0002": {
+            "status": "VULNERABLE",
+            "patches": [
+                "249-QUEUED-CE"
+            ]
+        },
+        "CVE-2026-0003": {
+            "status": "UNKNOWN",
+            "patches": [
+                "249-DUPLICATE-CE"
+            ]
+        },
+        "CVE-2026-0004": {
+            "status": "NOT_APPLICABLE",
+            "patches": [
+                "249-MISORDERED-CE"
+            ]
+        },
+        "CVE-2026-0005": {
+            "status": "PROTECTED",
+            "patches": [
+                "249-MISSING-CE"
+            ]
+        },
+        "CVE-2026-0006": {
+            "status": "VULNERABLE",
+            "patches": [
+                "249-ENTITLED-CE"
+            ]
+        },
+        "CVE-2026-0007": {
+            "status": "UNKNOWN",
+            "patches": [
+                "249-UNKNOWN-CE"
+            ]
+        },
+        "CVE-2026-0008": {
+            "status": "NOT_APPLICABLE",
+            "patches": [
+                "249-NOTAPPLICABLE-CE"
+            ]
+        }
+    },
+    "summary": {
+        "applied": 1,
+        "queued": 1,
+        "duplicate": 1,
+        "misordered": 1,
+        "missing": 1,
+        "entitled": 1,
+        "unknown": 1,
+        "not_applicable": 1
+    },
+    "warnings": [
+        "Registry is older than one hour.",
+        "Ignoring m2-hotfixes/notes.txt."
+    ],
+    "cross_check": {
+        "status": "skipped",
+        "compared": 0,
+        "disagreements": [],
+        "warning": "Adobe patch-status not installed here; cross-check skipped"
+    }
+}
