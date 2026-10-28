@@ -35,6 +35,21 @@ final class SystemPatchBinary implements PatchBinary
         }
     }
 
+    /**
+     * @throws RuntimeFailure when the patch program cannot be started
+     */
+    public function requireAvailable(): void
+    {
+        if ($this->isAvailable()) {
+            return;
+        }
+
+        throw new RuntimeFailure(
+            'The "patch" program is not installed or not on PATH. '
+            . 'Install it (for example "apt-get install patch" or "brew install gpatch") and run patchline again.',
+        );
+    }
+
     private function run(string $diff, string $workDir, bool $reverse, bool $dryRun): PatchRun
     {
         $file = tempnam(sys_get_temp_dir(), 'patchline-diff-');

@@ -17,6 +17,7 @@ use Patchline\Cli\Output\Style;
 use Patchline\Cli\Output\TextFormatter;
 use Patchline\CrossCheck\PatchStatusCrossCheck;
 use Patchline\Detection\DiffParser;
+use Patchline\Detection\SystemPatchBinary;
 use Patchline\Infrastructure\Clock;
 use Patchline\Infrastructure\Filesystem;
 use Patchline\Infrastructure\GuzzleHttpClient;
@@ -25,6 +26,7 @@ use Patchline\Infrastructure\LocalFilesystem;
 use Patchline\Infrastructure\ProcessRunner;
 use Patchline\Infrastructure\SymfonyProcessRunner;
 use Patchline\Infrastructure\SystemClock;
+use Patchline\Rewind\QueueRewinder;
 use Patchline\Sync\Executor;
 use Patchline\Verify\QueueReplayer;
 
@@ -44,6 +46,16 @@ final class Container
     public function filesystem(): Filesystem
     {
         return $this->filesystem;
+    }
+
+    public function patchBinary(): SystemPatchBinary
+    {
+        return new SystemPatchBinary($this->processes);
+    }
+
+    public function queueRewinder(): QueueRewinder
+    {
+        return new QueueRewinder($this->patchBinary(), new DiffParser(), $this->filesystem);
     }
 
     /**

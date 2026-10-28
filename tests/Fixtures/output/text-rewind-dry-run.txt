@@ -1,0 +1,6 @@
+Rewinding the patch queue, newest entry first
+  3. m2-hotfixes/2026-01-13_rewind-hotfix.patch: would reverse
+  2. vendor/magento/magento-cloud-patches/patches/b.patch (Patch B): would reverse
+  1. vendor/magento/magento-cloud-patches/patches/a.patch (Patch A): would reverse
+
+Dry run: 3 patches would be reversed. Nothing was changed.

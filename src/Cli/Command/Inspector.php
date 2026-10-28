@@ -12,15 +12,12 @@ use Patchline\Detection\DryRunDetector;
 use Patchline\Detection\SystemPatchBinary;
 use Patchline\Download\CredentialsResolver;
 use Patchline\Download\PatchDownloader;
-use Patchline\Exception\RuntimeFailure;
 use Patchline\Infrastructure\Clock;
 use Patchline\Infrastructure\Filesystem;
 use Patchline\Infrastructure\HttpClient;
 use Patchline\Infrastructure\ProcessRunner;
 use Patchline\Installation\InstallationReader;
-use Patchline\Queue\PatchQueue;
-use Patchline\Queue\Source\CloudPatchesSource;
-use Patchline\Queue\Source\HotfixDirSource;
+use Patchline\Queue\QueueReader;
 use Patchline\Registry\ComponentResolver;
 use Patchline\Registry\DependencyGraph;
 use Patchline\Registry\LoadedRegistry;
@@ -71,7 +68,7 @@ final class Inspector
             static fn (RegistryPatch $patch): string => $patch->id,
             $applicable,
         ));
-        $this->requirePatchBinary();
+        $this->patchBinary->requireAvailable();
         $detections = (new DryRunDetector(
             $installation,
             $this->downloader(),
@@ -79,11 +76,7 @@ final class Inspector
             $this->patchBinary,
             $this->filesystem,
         ))->detect($applicable, $graph);
-        $queue = PatchQueue::fromSources(
-            (new CloudPatchesSource($this->filesystem))
-                ->collect($installation->root, $installation->packages),
-            (new HotfixDirSource($this->filesystem))->collect($installation->root),
-        );
+        $queue = (new QueueReader($this->filesystem))->read($installation);
         $report = (new Analyzer())->analyze(new AnalysisInput(
             $installation,
             $resolver->installedComponents($installation),
@@ -131,16 +124,6 @@ final class Inspector
             $this->config->noCache(),
             $origins,
         );
-    }
-
-    private function requirePatchBinary(): void
-    {
-        if (!$this->patchBinary->isAvailable()) {
-            throw new RuntimeFailure(
-                'The "patch" program is not installed or not on PATH. '
-                . 'Install it (for example "apt-get install patch" or "brew install gpatch") and run patchline again.',
-            );
-        }
     }
 
     private function allowInsecure(): bool

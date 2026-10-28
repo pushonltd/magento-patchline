@@ -4,6 +4,9 @@
             "patchline status --fail-on=missing,duplicate",
             "@apply-patches"
         ],
-        "apply-patches": "ece-patches apply"
+        "apply-patches": [
+            "patchline rewind",
+            "ece-patches apply"
+        ]
     }
 }

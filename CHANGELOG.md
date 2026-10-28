@@ -14,6 +14,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `patchline sync`: downloads missing patches into `m2-hotfixes/` (sha256-verified), with `--dry-run`, `--adopt`
   (rename hand-copied files) and `--prune` (remove duplicates of cloud-patches files).
 - `patchline verify`: replays the patch queue on a copy of the store to predict whether `ece-patches apply` succeeds.
+- `patchline rewind`: reverses the patch queue in `vendor/` (after a dry run on a temporary copy) so `ece-patches apply`
+  can run again on a persistent `vendor/`; `--dry-run` shows the plan. Wire it as `"apply-patches": ["patchline rewind", "ece-patches apply"]`.
 - `--cross-check` against Adobe's `vendor/bin/patch-status`.
 - Configuration through flags, `PATCHLINE_*` environment variables and `extra.patchline` in `composer.json`.
 - Self-contained `patchline.phar` with a checksum, CI examples for GitHub Actions and GitLab, and `docs/ci.md`.

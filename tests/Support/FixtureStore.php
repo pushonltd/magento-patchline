@@ -83,6 +83,16 @@ final class FixtureStore
      */
     public function run(array $arguments, array $environment = [], ?Container $container = null): array
     {
+        return $this->runWith($this->arguments($arguments), $environment, $container);
+    }
+
+    /**
+     * @param list<string> $arguments complete argument list
+     * @param array<string, string> $environment
+     * @return array{stdout: string, stderr: string, exitCode: int}
+     */
+    private function runWith(array $arguments, array $environment, ?Container $container): array
+    {
         $stdout = fopen('php://memory', 'w+');
         $stderr = fopen('php://memory', 'w+');
         if ($stdout === false || $stderr === false) {
@@ -90,7 +100,7 @@ final class FixtureStore
         }
 
         $exitCode = (new Application($container ?? new Container()))->run(
-            $this->arguments($arguments),
+            $arguments,
             $this->environment($environment),
             $this->root(),
             $stdout,
@@ -102,6 +112,34 @@ final class FixtureStore
             'stderr' => self::contents($stderr),
             'exitCode' => $exitCode,
         ];
+    }
+
+    /**
+     * Like patchline() for commands that do not take the registry options: only --root and --no-ansi are appended.
+     *
+     * @param list<string> $arguments command and options
+     * @param array<string, string> $environment
+     * @return array{stdout: string, stderr: string, exitCode: int}
+     */
+    public function patchlineRaw(array $arguments, array $environment = [], ?string $binary = null): array
+    {
+        return PhpProcess::run(
+            [$binary ?? self::binary(), ...$this->rawArguments($arguments)],
+            null,
+            $this->environment($environment),
+        );
+    }
+
+    /**
+     * Like run() for commands that do not take the registry options.
+     *
+     * @param list<string> $arguments command and options
+     * @param array<string, string> $environment
+     * @return array{stdout: string, stderr: string, exitCode: int}
+     */
+    public function runRaw(array $arguments, array $environment = [], ?Container $container = null): array
+    {
+        return $this->runWith($this->rawArguments($arguments), $environment, $container);
     }
 
     /** @return array<string, string> relative path => sha256 of every file in the store */
@@ -119,6 +157,15 @@ final class FixtureStore
         $override = getenv('PATCHLINE_BIN');
 
         return $override !== false && $override !== '' ? $override : dirname(__DIR__, 2) . '/bin/patchline';
+    }
+
+    /**
+     * @param list<string> $arguments
+     * @return list<string>
+     */
+    private function rawArguments(array $arguments): array
+    {
+        return [...$arguments, '--root=' . $this->root(), '--no-ansi'];
     }
 
     /**

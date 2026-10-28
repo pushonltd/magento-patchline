@@ -13,7 +13,8 @@ compatible with its own checker, `vendor/bin/patch-status` (the Commerce Version
 ## Non-goals
 
 - Patchline never applies patches to a store. `ece-patches apply` does that.
-- It never modifies `vendor/`.
+- It never modifies `vendor/`, with one exception: `rewind` reverses the queued patches in `vendor/` so that
+  `ece-patches apply`, which runs right after, can reapply them. It is the only code that writes to `vendor/`.
 - It never downloads at deploy time unless asked (`sync` is explicit).
 - It does not work around Commerce entitlements.
 - It does not track other patching mechanisms (composer-patches, deploy scripts, hand-applied diffs, custom
@@ -44,11 +45,17 @@ patchline status [--root=.] [--format=text|json|github|junit] [--fail-on=missing
                  [--cross-check]
 patchline sync   [same as status] [--dry-run] [--adopt] [--prune]
 patchline verify [same as status]
+patchline rewind [--root=.] [--dry-run]
 patchline --help | --version
 ```
 
-Exit codes: `0` ok, `1` findings matching `--fail-on`, `2` usage error, `3` runtime error
-(registry unreachable with no cache, no `patch` binary, unreadable store, I/O failure).
+Exit codes: `0` ok, `1` findings matching `--fail-on` (for `rewind`: blocked, nothing changed), `2` usage error, `3` runtime error
+(registry unreachable with no cache, no `patch` binary, unreadable store, I/O failure; for `rewind` also
+`magento-cloud-patches` not installed).
+
+`rewind` is offline: it ignores the registry, `extra.patchline` and `PATCHLINE_*`. It simulates the whole
+rewind and replay on a temporary copy of the store and commits to `vendor/` only when the queue replays cleanly;
+a blocked rewind changes nothing.
 
 Configuration precedence: CLI flag > `PATCHLINE_*` environment variable > `extra.patchline` in the
 store's `composer.json` > default.
@@ -72,13 +79,15 @@ store's `composer.json` > default.
                   ┌───────────────────────────────┼─────────────────────────────┐
                   ▼                               ▼                             ▼
              status: Formatter               sync: Planner ─▶ Plan ─▶ Executor  verify: QueueReplayer
+
+ rewind (no registry, no network): PatchQueue ─▶ QueueRewinder ─▶ simulate on temp copy ─▶ commit to vendor/
 ```
 
 ## Namespaces (`Patchline\` → `src/`)
 
 | Namespace | Responsibility |
 |---|---|
-| `Cli` | Symfony Console `Application` + `Command\{Status,Sync,Verify}` (exit codes 0/1/2/3), `Config`/`ConfigResolver` (precedence), `Output\{Text,Json,Github,Junit}Formatter` |
+| `Cli` | Symfony Console `Application` + `Command\{Status,Sync,Verify}`, `Console\RewindCommand` (exit codes 0/1/2/3), `Config`/`ConfigResolver` (precedence), `Output\{Text,Json,Github,Junit}Formatter`, `Output\RewindTextRenderer` |
 | `Infrastructure` | Side-effect seams: `Filesystem`, `HttpClient` (Guzzle adapter), `Clock`, `ProcessRunner` (Symfony Process adapter), each an interface with one real implementation. Test doubles live in `tests/Double/`. |
 | `Installation` | `Installation` (root, installed packages, replaced packages, edition, base version) built from `composer.lock`, falling back to `vendor/composer/installed.json` |
 | `Registry` | `RegistryPatch`, `Area`, `Registry` value objects; `RegistryParser` (validates untyped JSON into typed objects); `RegistryLoader` (remote/cache/file); `ComponentResolver`; `DependencyGraph` |
@@ -88,6 +97,7 @@ store's `composer.json` > default.
 | `Analysis` | `Analyzer`, `PatchState` (enum), `PatchReport`, `Report`, `CveStatus` |
 | `Sync` | `Planner` (pure), `Plan`, `Action\{Download,Rename,Remove,Warn}`, `Executor` |
 | `Verify` | `QueueReplayer`, `VerifyResult` |
+| `Rewind` | `QueueRewinder` (simulate on a temp copy, then commit), `RewindResult`, `RewindStep`, `RewindOutcome` |
 | `CrossCheck` | `PatchStatusCrossCheck` (runs Adobe's `vendor/bin/patch-status --format=json` and compares) |
 
 ## Patch states

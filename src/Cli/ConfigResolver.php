@@ -94,9 +94,11 @@ final class ConfigResolver
     }
 
     /**
+     * The store root: the given path (`~` and relative paths expanded) or the working directory.
+     *
      * @param array<string, string> $env
      */
-    private function resolveRoot(?string $given, array $env, string $cwd): string
+    public function resolveRoot(?string $given, array $env, string $cwd): string
     {
         $root = $given ?? $cwd;
         if ($root === '~' || str_starts_with($root, '~/')) {

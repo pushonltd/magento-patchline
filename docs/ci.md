@@ -6,11 +6,23 @@ Copy-ready examples live in `examples/`:
 |---|---|
 | `examples/github/patchline-sync.yml` | Daily GitHub workflow that runs `sync`, `verify` and opens a pull request with the new patches. |
 | `examples/gitlab/.gitlab-ci.patchline.yml` | `status` job with a JUnit report, plus a scheduled `sync` job. |
-| `examples/composer-scripts.json` | Composer `post-install-cmd` hook that runs the read-only `status` before `@apply-patches`. |
+| `examples/composer-scripts.json` | Composer `post-install-cmd` hook that runs the read-only `status`, then `@apply-patches` (`patchline rewind` before `ece-patches apply`). |
 
 Merge `examples/composer-scripts.json` into your `composer.json`; adjust `apply-patches` to whatever your project
 already calls. Keep `sync` out of deploy. It writes to `m2-hotfixes/` and needs the network. Run it in a scheduled pipeline,
 review the resulting pull request and let the normal deploy only run `status`.
+
+## Rewinding before `ece-patches apply`
+
+`"apply-patches": ["patchline rewind", "ece-patches apply"]` makes `ece-patches apply` re-runnable on a `vendor/`
+that already carries the patches (local development, Hypernode, any host that keeps `vendor/` between deploys). On a
+fresh install rewind is a no-op. Rewind exits 1 when it is blocked (for example by a patch applied outside the
+queue); it then changes nothing and the script list stops.
+
+Caveat: between `patchline rewind` and `ece-patches apply`, `vendor/` is unpatched. A live store serving from that
+`vendor/` may serve unpatched or half-reverted code. Run the pair in a build step or maintenance window, never
+against the live docroot while it serves traffic. The deploy must fail if `ece-patches apply` fails; Composer stops
+a script list at the first non-zero exit.
 
 ## Self-contained PHAR
 
@@ -33,7 +45,7 @@ To build it yourself: `composer update --working-dir=tools/box && composer build
 | Code | Meaning |
 |---|---|
 | 0 | OK |
-| 1 | Findings matching `--fail-on` (default `missing,duplicate,misordered`), or a failed `sync` or `verify` |
+| 1 | Findings matching `--fail-on` (default `missing,duplicate,misordered`), a failed `sync` or `verify`, or a blocked `rewind` |
 | 2 | Usage error |
 | 3 | Runtime error: registry unreachable without a cache, no `patch` program, unreadable store, I/O failure |
 

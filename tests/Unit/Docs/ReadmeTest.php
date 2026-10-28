@@ -26,14 +26,14 @@ final class ReadmeTest extends TestCase
         }
 
         $section = $this->section($readme, 'Commands');
-        foreach (['status', 'sync', 'verify'] as $name) {
+        foreach (['status', 'sync', 'verify', 'rewind'] as $name) {
             self::assertArrayHasKey($name, $commands);
             self::assertStringContainsString('### `' . $name . '`', $section, $name . ' is not described.');
         }
 
         preg_match_all('/^\| `(--[a-z-]+)(?:=[^`]*)?` \|/m', $section, $flags);
         $known = [];
-        foreach (['status', 'sync', 'verify'] as $name) {
+        foreach (['status', 'sync', 'verify', 'rewind'] as $name) {
             $command = $commands[$name];
             foreach ($command->getNativeDefinition()->getOptions() as $option) {
                 $known[$option->getName()] = true;

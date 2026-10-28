@@ -64,6 +64,7 @@ Next: run patchline sync to download the missing patches.
 patchline status [options]
 patchline sync [options]
 patchline verify [options]
+patchline rewind [--root=ROOT] [--dry-run]
 ```
 
 ### `status`
@@ -80,6 +81,55 @@ overwritten and `vendor/` is not touched.
 
 Replays the patch queue on a temporary copy, as a fresh deploy would, and reports the first patch that would fail.
 
+### `rewind`
+
+Reverses the patch queue (cloud-patches, then `m2-hotfixes/`) in `vendor/`, newest entry first, so `ece-patches apply`
+can run again on a store whose `vendor/` already carries the patches. It is the only command that changes `vendor/`,
+and it only reverses patches that `ece-patches apply` puts back right after.
+
+```text
+$ patchline rewind
+Rewinding the patch queue, newest entry first
+  3. m2-hotfixes/2026-01-13_rewind-hotfix.patch: reversed
+  2. vendor/magento/magento-cloud-patches/patches/b.patch (Patch B): reversed
+  1. vendor/magento/magento-cloud-patches/patches/a.patch (Patch A): reversed
+
+Reversed 3 patches. Run ece-patches apply next.
+```
+
+Recommended wiring, in the store's `composer.json`:
+
+```json
+"apply-patches": ["patchline rewind", "ece-patches apply"]
+```
+
+On a persistent `vendor/` (local development, Hypernode, any host that keeps `vendor/` between deploys) this makes
+`ece-patches apply` re-runnable. On a fresh install the queue is not applied yet, so rewind has nothing to do and
+exits 0.
+
+How it works:
+
+- It first reverses and replays the whole queue on a temporary copy. Only when the queue replays cleanly does it
+  change `vendor/`. A blocked rewind changes nothing and exits 1.
+- `--dry-run` shows what would be reversed and changes nothing.
+- It is offline: no registry, no network. It ignores `extra.patchline` and `PATCHLINE_*`; only `--root` and
+  `--dry-run` apply.
+- Needs the `patch` program and an installed `magento/magento-cloud-patches` (exit 3 otherwise).
+
+Exit codes: 0 reversed or nothing to do, 1 blocked, 2 usage error, 3 no `patch` program, unreadable store or
+`magento-cloud-patches` not installed. Here 1 means "blocked", not "findings".
+
+Limitations:
+
+- A patch applied in `vendor/` that is not in the queue (a hand-applied diff, a deleted `m2-hotfixes/` file, a local
+  edit touching the same lines) blocks the rewind, and then nothing is changed. Restore the file
+  (`patchline sync`) or reinstall `vendor/magento`, then run it again.
+
+Production safety: between `patchline rewind` and `ece-patches apply`, `vendor/` is unpatched (security fixes are
+removed), so a live store serving from that `vendor/` may serve unpatched or half-reverted code. Run the pair in a
+build step or maintenance window, never against the live docroot while it serves traffic. The deploy must fail if
+`ece-patches apply` fails; Composer stops a script list at the first non-zero exit.
+
 ### Options
 
 | Option | Commands | Meaning |
@@ -92,7 +142,7 @@ Replays the patch queue on a temporary copy, as a fresh deploy would, and report
 | `--no-cache` | all | Don't use cached files |
 | `--include-entitled` | all | Include Commerce-only patches (needs repo.magento.com keys) |
 | `--cross-check` | all | Compare the result with `vendor/bin/patch-status` |
-| `--dry-run` | `sync` | Show the plan, change nothing |
+| `--dry-run` | `sync`, `rewind` | Show the plan, change nothing |
 | `--adopt` | `sync` | Rename hand-copied hotfix files to the dated naming |
 | `--prune` | `sync` | Remove hotfix files that duplicate cloud-patches files |
 
@@ -116,7 +166,7 @@ Replays the patch queue on a temporary copy, as a fresh deploy would, and report
 | Code | Meaning |
 |---|---|
 | 0 | All good |
-| 1 | Something needs action (see `--fail-on`), or `sync`/`verify` failed |
+| 1 | Something needs action (see `--fail-on`), or `sync`/`verify` failed or `rewind` was blocked |
 | 2 | Wrong usage |
 | 3 | Could not run: no registry, no `patch` binary, unreadable store |
 

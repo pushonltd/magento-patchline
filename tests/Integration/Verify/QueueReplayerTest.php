@@ -17,6 +17,7 @@ use Patchline\Installation\Edition;
 use Patchline\Installation\Installation;
 use Patchline\Queue\PatchQueue;
 use Patchline\Queue\QueueEntry;
+use Patchline\Queue\QueueEntryDiff;
 use Patchline\Queue\QueueOrigin;
 use Patchline\Tests\Double\TempDirectory;
 use Patchline\Tests\Double\TemporaryDirectoryTrackingFilesystem;
@@ -45,6 +46,7 @@ use SplFileInfo;
 #[UsesClass(Installation::class)]
 #[UsesClass(PatchQueue::class)]
 #[UsesClass(QueueEntry::class)]
+#[UsesClass(QueueEntryDiff::class)]
 final class QueueReplayerTest extends TestCase
 {
     private const FILE_A = 'vendor/magento/module-a/a.php';
@@ -110,7 +112,7 @@ final class QueueReplayerTest extends TestCase
         self::assertNotSame('', $failed->output);
     }
 
-    public function test_it_accepts_an_older_monthly_patch_by_ignoring_the_patch_status_tool_and_flags_it(): void
+    public function test_the_patch_status_overlap_note_tells_the_user_to_run_rewind(): void
     {
         $this->storeFile(self::TOOL, ['tool v2']);
         $this->storeFile(self::FILE_A, ['a v1']);
@@ -123,7 +125,10 @@ final class QueueReplayerTest extends TestCase
         self::assertSame([ReplayOutcome::AlreadyAppliedIgnoringPatchStatus], $this->outcomes($result));
         self::assertCount(1, $result->notes);
         self::assertStringContainsString('vendor/bin/patch-status', $result->notes[0]);
-        self::assertStringContainsString('ece-patches apply will fail here', $result->notes[0]);
+        self::assertStringContainsString(
+            'ece-patches apply fails on an already patched vendor/. Run patchline rewind before ece-patches apply.',
+            $result->notes[0],
+        );
     }
 
     public function test_it_replays_a_diff_that_creates_a_new_file(): void
@@ -187,7 +192,7 @@ final class QueueReplayerTest extends TestCase
         self::assertSame([ReplayOutcome::WouldApply, ReplayOutcome::WouldApply], $this->outcomes($result));
     }
 
-    public function test_it_notes_that_in_place_re_run_would_fail_while_a_fresh_install_succeeds(): void
+    public function test_the_in_place_note_tells_the_user_to_run_rewind(): void
     {
         $this->storeFile(self::FILE_A, ['three']);
         $this->enqueue('first.patch', $this->diff(self::FILE_A, ['one'], ['two']));
@@ -197,7 +202,8 @@ final class QueueReplayerTest extends TestCase
 
         self::assertSame(
             ['Re-running ece-patches apply on this already patched vendor/ would stop at m2-hotfixes/first.patch'
-                . ' (a newer patch changed the same lines). A fresh composer install applies cleanly.'],
+                . ' (a newer patch changed the same lines). Run patchline rewind first, or start from a fresh'
+                . ' composer install.'],
             $result->notes,
         );
     }

@@ -10,6 +10,7 @@ use Patchline\Infrastructure\Filesystem;
 use Patchline\Installation\Installation;
 use Patchline\Queue\PatchQueue;
 use Patchline\Queue\QueueEntry;
+use Patchline\Queue\QueueEntryDiff;
 
 /**
  * Predicts `ece-patches apply`: replays the queue in a temp copy of the files it touches.
@@ -18,16 +19,20 @@ final class QueueReplayer
 {
     private const PATCH_STATUS_OVERLAP_NOTE = 'Patch %s only counts as already applied when vendor/bin/patch-status'
         . ' is ignored (every monthly patch rewrites that file). Stock magento-cloud-patches does not ignore it,'
-        . ' so ece-patches apply will fail here unless it is patched to do so.';
+        . ' so ece-patches apply fails on an already patched vendor/. Run patchline rewind before ece-patches apply.';
 
     private const IN_PLACE_NOTE = 'Re-running ece-patches apply on this already patched vendor/ would stop at %s'
-        . ' (a newer patch changed the same lines). A fresh composer install applies cleanly.';
+        . ' (a newer patch changed the same lines). Run patchline rewind first,'
+        . ' or start from a fresh composer install.';
+
+    private readonly QueueEntryDiff $entryDiff;
 
     public function __construct(
         private readonly PatchBinary $patch,
         private readonly DiffParser $parser,
         private readonly Filesystem $filesystem,
     ) {
+        $this->entryDiff = new QueueEntryDiff($filesystem, $parser);
     }
 
     public function replay(Installation $installation, PatchQueue $queue): VerifyResult
@@ -48,7 +53,7 @@ final class QueueReplayer
         $this->filesystem->makeDirectory($inPlaceDir);
         $diffs = [];
         foreach ($queue->entries as $entry) {
-            $diff = $this->prepare($installation, $entry);
+            $diff = $this->entryDiff->prepare($installation, $entry);
             $this->copyTouchedFiles($installation->root, $freshDir, $diff);
             $this->copyTouchedFiles($installation->root, $inPlaceDir, $diff);
             $diffs[] = $diff;
@@ -121,15 +126,6 @@ final class QueueReplayer
         }
 
         return new VerifyResult($steps, $notes);
-    }
-
-    /** Same preparation as ece-patches' Applier::prepareContent(). */
-    private function prepare(Installation $installation, QueueEntry $entry): string
-    {
-        $content = $this->filesystem->read($installation->root . '/' . $entry->path);
-        $content = (string) preg_replace(['/^diff --git/', '/\ndiff --git/'], ['diff -Nuar', "\ndiff -Nuar"], $content);
-
-        return $this->parser->withoutPackages($content, $installation->replacedPackages, [])->text;
     }
 
     private function copyTouchedFiles(string $root, string $workDir, string $diff): void

@@ -6,6 +6,7 @@ namespace Patchline\Cli;
 
 use Patchline\Cli\Console\ConsoleApplication;
 use Patchline\Cli\Console\PatchlineCommand;
+use Patchline\Cli\Console\RewindCommand;
 use Patchline\Cli\Console\StreamConsoleOutput;
 use Patchline\Exception\RuntimeFailure;
 use Patchline\Exception\UsageException;
@@ -85,7 +86,7 @@ final class Application
     }
 
     /**
-     * The Console application with the status, sync and verify commands.
+     * The Console application with the status, sync, verify and rewind commands.
      *
      * @param array<string, string> $env
      */
@@ -101,6 +102,8 @@ final class Application
         foreach ($commands as $name => [$summary, $syncOptions]) {
             $instances[] = new PatchlineCommand($name, $summary, $syncOptions, $this->container, $env, $cwd);
         }
+
+        $instances[] = new RewindCommand($this->container, $env, $cwd);
 
         return new ConsoleApplication(PackageVersion::current(), $instances);
     }

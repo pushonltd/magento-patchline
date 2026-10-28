@@ -53,6 +53,7 @@ use Patchline\Installation\InstallationReader;
 use Patchline\PackageVersion;
 use Patchline\Queue\PatchQueue;
 use Patchline\Queue\QueueEntry;
+use Patchline\Queue\QueueEntryDiff;
 use Patchline\Queue\Source\CloudPatchesSource;
 use Patchline\Queue\Source\HotfixDirSource;
 use Patchline\Queue\Source\SourceResult;
@@ -140,6 +141,7 @@ use PHPUnit\Framework\TestCase;
 #[UsesClass(PackageVersion::class)]
 #[UsesClass(PatchQueue::class)]
 #[UsesClass(QueueEntry::class)]
+#[UsesClass(QueueEntryDiff::class)]
 #[UsesClass(CloudPatchesSource::class)]
 #[UsesClass(HotfixDirSource::class)]
 #[UsesClass(SourceResult::class)]

@@ -80,8 +80,21 @@ final class ExamplesTest extends TestCase
         self::assertNotEmpty($invocations, $file . ' contains no patchline command');
         foreach ($invocations as $arguments) {
             $input = CommandInput::parse($arguments);
-            self::assertContains($input->getFirstArgument(), ['status', 'sync', 'verify'], implode(' ', $arguments));
+            self::assertContains(
+                $input->getFirstArgument(),
+                ['status', 'sync', 'verify', 'rewind'],
+                implode(' ', $arguments),
+            );
         }
+    }
+
+    public function test_the_composer_scripts_example_runs_rewind_before_ece_patches_apply(): void
+    {
+        $composer = json_decode($this->read('examples/composer-scripts.json'), true);
+
+        self::assertIsArray($composer);
+        self::assertIsArray($composer['scripts']);
+        self::assertSame(['patchline rewind', 'ece-patches apply'], $composer['scripts']['apply-patches']);
     }
 
     /**
@@ -91,7 +104,7 @@ final class ExamplesTest extends TestCase
     {
         $found = [];
         foreach (explode("\n", $contents) as $line) {
-            $pattern = '/(?<![\w-])patchline\s+((?:status|sync|verify)\b[^`"|>]*)/';
+            $pattern = '/(?<![\w-])patchline\s+((?:status|sync|verify|rewind)\b[^`"|>]*)/';
             if (preg_match($pattern, $line, $match) !== 1) {
                 continue;
             }
