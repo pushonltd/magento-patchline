@@ -58,6 +58,7 @@ final class DryRunDetectorTest extends TestCase
 {
     private const BASE = 'https://registry.test/patch';
     private const FILE = 'vendor/magento/module-x/f.php';
+    private const TOOL = 'vendor/magento/module-x/tool';
 
     private TempDirectory $store;
     private TempDirectory $cache;
@@ -108,6 +109,38 @@ final class DryRunDetectorTest extends TestCase
         $states = array_map(static fn ($result): DetectionState => $result->state, $results->all());
         self::assertSame($expected, $states);
         self::assertSame($before, $this->checksums());
+        self::assertSame([], $results->warnings());
+    }
+
+    /**
+     * Like Adobe's monthly patches: every patch requires all earlier ones and rewrites a shared tool file, and B
+     * touches only that tool file. D cannot be classified on the store (it builds on the missing C), and A only
+     * reverses once B is out of the way, so B must take part in the replay although it shares no file with D.
+     */
+    public function test_it_replays_a_prerequisite_that_only_shares_a_file_with_another_prerequisite(): void
+    {
+        $versions = $this->versions();
+        $this->writeStoreFile($versions[1]);
+        file_put_contents($this->store->path(self::TOOL), "tool 2\n");
+        $diffs = [
+            '999-A' => $this->diff($versions[0], $versions[1]) . $this->toolDiff(0, 1),
+            '999-B' => $this->toolDiff(1, 2),
+            '999-C' => $this->diff($versions[1], $versions[2]),
+            '999-D' => $this->diff($versions[2], $versions[3]),
+        ];
+        $patches = [];
+        $requires = [];
+        foreach ($diffs as $id => $diff) {
+            $patches[] = $this->registryPatch($id, $diff, $requires);
+            $requires[] = $id;
+        }
+
+        $results = $this->detector($patches)->detect($patches, $this->graph($patches));
+
+        $states = array_map(static fn ($result): DetectionState => $result->state, $results->all());
+        $applied = DetectionState::Applied;
+        $missing = DetectionState::NotApplied;
+        self::assertSame(['999-A' => $applied, '999-B' => $applied, '999-C' => $missing, '999-D' => $missing], $states);
         self::assertSame([], $results->warnings());
     }
 
@@ -189,6 +222,16 @@ final class DryRunDetectorTest extends TestCase
             $start + 1,
             $length,
             $body,
+        );
+    }
+
+    private function toolDiff(int $from, int $to): string
+    {
+        return sprintf(
+            "diff --git a/%1\$s b/%1\$s\n--- a/%1\$s\n+++ b/%1\$s\n@@ -1 +1 @@\n-tool %2\$d\n+tool %3\$d\n",
+            self::TOOL,
+            $from,
+            $to,
         );
     }
 

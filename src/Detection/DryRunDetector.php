@@ -187,14 +187,26 @@ final class DryRunDetector
     /**
      * @param array<string, string> $diffs
      * @param list<string> $files
-     * @return array<string, string> the diffs that touch at least one of $files
+     * @return array<string, string> the diffs that touch one of $files, or a file of another diff returned, in order
      */
     private function overlapping(array $diffs, array $files): array
     {
-        return array_filter(
-            $diffs,
-            fn (string $diff): bool => array_intersect($this->parser->files($diff), $files) !== [],
-        );
+        $selected = [];
+        do {
+            $added = false;
+            foreach ($diffs as $id => $diff) {
+                $touched = $this->parser->files($diff);
+                if (isset($selected[$id]) || array_intersect($touched, $files) === []) {
+                    continue;
+                }
+
+                $selected[$id] = true;
+                $files = array_merge($files, $touched);
+                $added = true;
+            }
+        } while ($added);
+
+        return array_intersect_key($diffs, $selected);
     }
 
     /**
@@ -243,16 +255,20 @@ final class DryRunDetector
     }
 
     /**
-     * Applies each diff (oldest first) that is not already applied.
+     * Rewinds the prerequisites (newest first), then applies them all (oldest first). An applied prerequisite with a
+     * newer one on top does not reverse on its own (every monthly patch rewrites vendor/bin/patch-status), so it can
+     * only be recognised once the newer ones are out of the way.
      *
-     * @param array<string, string> $prerequisites
+     * @param array<string, string> $prerequisites oldest first
      */
     private function applyAll(string $workDir, string $patchId, array $prerequisites): ?string
     {
+        $failure = $this->reverseAll($workDir, $patchId, array_reverse($prerequisites));
+        if ($failure !== null) {
+            return $failure;
+        }
+
         foreach ($prerequisites as $diff) {
-            if ($this->binary->dryRun($diff, $workDir, true)->succeeded) {
-                continue;
-            }
             if (!$this->binary->apply($diff, $workDir, false)->succeeded) {
                 return sprintf(
                     'Could not apply an earlier patch while checking %s; the result may be inaccurate.',
