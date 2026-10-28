@@ -9,7 +9,11 @@ require_once __DIR__ . '/PharBuild.php';
 $root = dirname(__DIR__);
 $version = null;
 $output = $root . '/dist';
-foreach (array_slice($argv, 1) as $argument) {
+$arguments = is_array($_SERVER['argv'] ?? null) ? array_slice($_SERVER['argv'], 1) : [];
+foreach ($arguments as $argument) {
+    if (!is_string($argument)) {
+        continue;
+    }
     if (str_starts_with($argument, '--version=')) {
         $version = substr($argument, 10);
         continue;
