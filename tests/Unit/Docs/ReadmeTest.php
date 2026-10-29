@@ -83,7 +83,7 @@ final class ReadmeTest extends TestCase
         self::assertIsArray($scripts);
         self::assertIsArray($scripts['scripts']);
         self::assertSame(
-            ['php patchline.phar rewind', 'vendor/bin/ece-patches apply'],
+            ['vendor/bin/patchline rewind', 'vendor/bin/ece-patches apply'],
             $scripts['scripts']['apply-patches'],
         );
     }
