@@ -4,12 +4,15 @@ declare(strict_types=1);
 
 namespace Patchline\Tests\Unit\Update;
 
+use Patchline\Update\ReleaseFeed;
 use Patchline\Update\UpdateAvailability;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\UsesClass;
 use PHPUnit\Framework\TestCase;
 
 #[CoversClass(UpdateAvailability::class)]
+#[UsesClass(ReleaseFeed::class)]
 final class UpdateAvailabilityTest extends TestCase
 {
     public function test_it_reports_an_update_when_the_latest_version_is_greater_than_the_current_version(): void

@@ -5,17 +5,27 @@ declare(strict_types=1);
 namespace Patchline\Tests\Unit\Update;
 
 use DateTimeImmutable;
+use Patchline\Infrastructure\HttpResponse;
 use Patchline\Infrastructure\LocalFilesystem;
 use Patchline\PackageVersion;
 use Patchline\Tests\Double\FakeHttpClient;
 use Patchline\Tests\Double\FrozenClock;
 use Patchline\Tests\Double\TempDirectory;
+use Patchline\Update\ReleaseFeed;
+use Patchline\Update\ReleaseFeedParser;
+use Patchline\Update\UpdateAvailability;
 use Patchline\Update\UpdateChecker;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\UsesClass;
 use PHPUnit\Framework\TestCase;
 
 #[CoversClass(UpdateChecker::class)]
+#[UsesClass(HttpResponse::class)]
+#[UsesClass(LocalFilesystem::class)]
+#[UsesClass(ReleaseFeed::class)]
+#[UsesClass(ReleaseFeedParser::class)]
+#[UsesClass(UpdateAvailability::class)]
 final class UpdateCheckerTest extends TestCase
 {
     private const URL = 'https://repo.packagist.org/p2/example/patchline.json';

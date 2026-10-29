@@ -4,13 +4,16 @@ declare(strict_types=1);
 
 namespace Patchline\Tests\Unit\Update;
 
+use Patchline\Cli\Output\GithubFormatter;
 use Patchline\Cli\OutputFormat;
 use Patchline\Update\UpdateNotice;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\UsesClass;
 use PHPUnit\Framework\TestCase;
 
 #[CoversClass(UpdateNotice::class)]
+#[UsesClass(GithubFormatter::class)]
 final class UpdateNoticeTest extends TestCase
 {
     private const INSTALL = 'curl -fsSL '
