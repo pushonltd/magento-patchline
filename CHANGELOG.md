@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- The README shows two ways in: the released PHAR to check and sync, and a Composer install
+  (`composer require pushonltd/magento-patchline`, not `--dev`) for the `composer install` wiring, which calls
+  `vendor/bin/patchline rewind` again.
+
 ## [0.0.3] - 2026-10-29
 
 ### Added

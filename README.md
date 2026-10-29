@@ -42,9 +42,18 @@ php patchline.phar sync      # download the missing ones into m2-hotfixes/
 php patchline.phar verify    # will ece-patches apply succeed?
 ```
 
-Add the wiring below, commit `patchline.phar` and `m2-hotfixes/`, and deploy as usual.
+No Composer needed. Commit `m2-hotfixes/`. To apply the patches on every `composer install`, add the
+[wiring](#recommended-wiring).
 
 ## Recommended wiring
+
+Add Patchline to the store with Composer:
+
+```bash
+composer require pushonltd/magento-patchline
+```
+
+Not `--dev`: the scripts below also run on `composer install --no-dev`.
 
 In the store's `composer.json`:
 
@@ -52,22 +61,19 @@ In the store's `composer.json`:
 "scripts": {
     "post-install-cmd": ["@apply-patches"],
     "post-update-cmd": ["@apply-patches"],
-    "apply-patches": ["php patchline.phar rewind", "vendor/bin/ece-patches apply"]
+    "apply-patches": ["vendor/bin/patchline rewind", "vendor/bin/ece-patches apply"]
 }
 ```
 
-Every monthly patch rewrites `vendor/bin/patch-status`, so stock `ece-patches apply` works once, on a freshly
-unpacked `vendor/`.
-Run it again on the same `vendor/` (local DDEV, or a host that keeps `vendor/` between deploys) and it fails on the
-older monthly patch.
+Stock `ece-patches apply` expects a freshly unpacked `vendor/`.
+On a `vendor/` that is already patched (local DDEV, or a host that keeps `vendor/` between deploys) it can fail.
 
 **`patchline rewind` takes the queue back out first.** Then `ece-patches apply` starts clean every time.
 On a fresh install there is nothing to rewind, and it exits 0.
 
-Installed with Composer? Use `vendor/bin/patchline rewind` instead.
-
-Check the result with `php patchline.phar status`.
-Keep it out of the scripts. It needs the registry, and it fails as soon as Adobe ships a patch you haven't synced.
+To check the result, run `vendor/bin/patchline status` yourself or in CI.
+Don't add `status` to the composer scripts. It needs to reach Adobe's registry, and it exits 1 whenever Adobe ships
+a patch you haven't synced yet, so it would break `composer install`.
 
 ## Where the patches come from
 
@@ -99,7 +105,7 @@ This puts `patchline.phar` in the current directory. It runs without `composer i
 The script always checks the sha256. With `gh` installed and logged in, it also verifies the build provenance.
 Pin a version with `PATCHLINE_VERSION=v0.0.3`. Install elsewhere with `bash -s -- --path=/usr/local/bin/patchline`.
 
-Or use Composer: `composer require --dev pushonltd/magento-patchline`, then run `vendor/bin/patchline`.
+Wiring it into `composer install`? Install it with Composer instead, as in [Recommended wiring](#recommended-wiring).
 
 `status`, `sync` and `verify` say when a newer release exists, at most once a day. Turn it off with
 `--no-update-check` or `PATCHLINE_NO_UPDATE_CHECK=1`.
