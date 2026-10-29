@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- An `unknown` patch that changes a file missing from the store now says so: the warning names the missing files
+  and notes that `ece-patches apply` would fail on them too. A store without the files `magento/magento2-base`
+  puts in `pub/errors/`, for example, left VULN-39341 `unknown` with no reason given.
+
 ### Changed
 
 - The README shows two ways in: the released PHAR to check and sync, and a Composer install

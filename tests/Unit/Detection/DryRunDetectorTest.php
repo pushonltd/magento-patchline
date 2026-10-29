@@ -111,6 +111,48 @@ final class DryRunDetectorTest extends TestCase
         self::assertSame('reverse output', $result->reverseOutput);
     }
 
+    public function test_it_names_the_file_missing_from_the_store_when_a_patch_is_unknown(): void
+    {
+        file_put_contents($this->store->path('f.txt'), "x\n");
+        $diff = self::diffFor('f.txt', 'a') . self::diffFor('pub/errors/processor.php', 'a');
+        $a = $this->patch('999-A', $diff);
+        $binary = new FakePatchBinary(static fn (PatchCall $call): PatchRun => new PatchRun(1));
+
+        $result = $this->detect([$a], $binary)->get('999-A');
+
+        self::assertSame(DetectionState::Unknown, $result->state);
+        self::assertSame(
+            ['Patch 999-A changes pub/errors/processor.php, which is not in the store, so its state is unknown.'
+                . ' Restore the missing file: ece-patches apply would fail on it too.'],
+            $result->warnings,
+        );
+    }
+
+    public function test_it_names_every_missing_file_when_a_patch_is_unknown(): void
+    {
+        $a = $this->patch('999-A', self::diffFor('f.txt', 'a') . self::diffFor('g.txt', 'a'));
+        $binary = new FakePatchBinary(static fn (PatchCall $call): PatchRun => new PatchRun(1));
+
+        $result = $this->detect([$a], $binary)->get('999-A');
+
+        self::assertSame(
+            ['Patch 999-A changes f.txt, g.txt, which are not in the store, so its state is unknown.'
+                . ' Restore the missing files: ece-patches apply would fail on them too.'],
+            $result->warnings,
+        );
+    }
+
+    public function test_it_does_not_report_missing_files_when_a_patch_is_detected(): void
+    {
+        $a = $this->patch('999-A', self::diffFor('f.txt', 'a'));
+        $binary = FakePatchBinary::byDiff([$this->text($a) => ['forward' => true, 'reverse' => false]]);
+
+        $result = $this->detect([$a], $binary)->get('999-A');
+
+        self::assertSame(DetectionState::NotApplied, $result->state);
+        self::assertSame([], $result->warnings);
+    }
+
     public function test_it_detects_an_older_patch_as_applied_when_a_newer_overlapping_patch_is_applied_on_top(): void
     {
         file_put_contents($this->store->path('f.txt'), "x\n");
