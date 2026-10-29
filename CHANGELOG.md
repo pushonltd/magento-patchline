@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.0.4] - 2026-10-29
+
 ### Added
 
 - An `unknown` patch that changes a file missing from the store now says so: the warning names the missing files
@@ -20,6 +22,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `vendor/bin/patchline rewind` again.
 - CI runs only what a change needs: PHP checks for code, tests and tool configuration; the README tests for
   `README.md`; ShellCheck and the install tests for `install.sh`; nothing for other Markdown files.
+- The README is shorter and easier to scan, with a screenshot of `patchline status`.
 
 ## [0.0.3] - 2026-10-29
 
@@ -68,7 +71,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Configuration through flags, `PATCHLINE_*` environment variables and `extra.patchline` in `composer.json`.
 - Self-contained `patchline.phar` with a checksum.
 
-[Unreleased]: https://github.com/pushonltd/magento-patchline/compare/v0.0.3...HEAD
+[Unreleased]: https://github.com/pushonltd/magento-patchline/compare/v0.0.4...HEAD
+[0.0.4]: https://github.com/pushonltd/magento-patchline/compare/v0.0.3...v0.0.4
 [0.0.3]: https://github.com/pushonltd/magento-patchline/compare/v0.0.2...v0.0.3
 [0.0.2]: https://github.com/pushonltd/magento-patchline/compare/v0.0.1...v0.0.2
 [0.0.1]: https://github.com/pushonltd/magento-patchline/releases/tag/v0.0.1
