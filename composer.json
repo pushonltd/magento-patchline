@@ -51,6 +51,9 @@
         "slevomat/coding-standard": "*",
         "squizlabs/php_codesniffer": "*"
     },
+    "suggest": {
+        "magento/quality-patches": "Adobe's quality patches (non-security fixes), applied with vendor/bin/magento-patches; Patchline covers the isolated security patches"
+    },
     "autoload": {
         "psr-4": {
             "Patchline\\": "src/"

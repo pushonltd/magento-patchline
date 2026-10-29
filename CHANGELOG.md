@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- `composer.json` suggests `magento/quality-patches` for Adobe's non-security fixes.
+- The README header is an SVG wordmark that stays aligned on GitHub and follows the light or dark theme.
+
 ## [0.0.4] - 2026-10-29
 
 ### Added
