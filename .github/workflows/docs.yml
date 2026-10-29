@@ -1,0 +1,47 @@
+name: Docs
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "README.md"
+      - "tests/Unit/Docs/**"
+      - ".github/workflows/docs.yml"
+  pull_request:
+    paths:
+      - "README.md"
+      - "tests/Unit/Docs/**"
+      - ".github/workflows/docs.yml"
+
+permissions: {}
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  readme:
+    name: README
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read # check out the repository
+    steps:
+      - name: Check out the repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Set up PHP
+        uses: shivammathur/setup-php@eb7c497e18156a6bbabfef1d3a82760b9eda3962 # 2.40.0
+        with:
+          php-version: "8.5"
+          coverage: none
+          tools: composer:v2
+
+      - name: Install dependencies
+        run: composer update --no-interaction --no-progress --prefer-dist
+
+      # The README documents every command option and the recommended wiring; these tests keep it honest.
+      - name: Run the README tests
+        run: vendor/bin/phpunit tests/Unit/Docs

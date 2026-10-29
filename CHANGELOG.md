@@ -12,6 +12,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - The README shows two ways in: the released PHAR to check and sync, and a Composer install
   (`composer require pushonltd/magento-patchline`, not `--dev`) for the `composer install` wiring, which calls
   `vendor/bin/patchline rewind` again.
+- CI runs only what a change needs: PHP checks for code, tests and tool configuration; the README tests for
+  `README.md`; ShellCheck and the install tests for `install.sh`; nothing for other Markdown files.
 
 ## [0.0.3] - 2026-10-29
 

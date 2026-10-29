@@ -80,7 +80,7 @@ final class WorkflowPolicyTest extends TestCase
         self::assertStringContainsString('failOnDeprecation="true"', $lowest);
         self::assertStringContainsString('failOnWarning="true"', $lowest);
         self::assertMatchesRegularExpression('/-c phpunit\.prefer-lowest\.xml\.dist/', $ci);
-        self::assertSame(1, substr_count($ci, 'phpunit.prefer-lowest.xml.dist'));
+        self::assertSame(1, substr_count($ci, '-c phpunit.prefer-lowest.xml.dist'));
     }
 
     public function test_the_mutation_job_runs_infection_on_php_8_5_with_pcov_and_uploads_the_log(): void
@@ -154,7 +154,7 @@ final class WorkflowPolicyTest extends TestCase
     public function test_no_workflow_or_package_targets_the_end_of_life_php_8_1(): void
     {
         self::assertMatchesRegularExpression('/"php":\s*">=8\.2"/', $this->read('composer.json'));
-        foreach (['ci.yml', 'release.yml', 'zizmor.yml'] as $workflow) {
+        foreach (['ci.yml', 'docs.yml', 'install-script.yml', 'release.yml', 'zizmor.yml'] as $workflow) {
             self::assertDoesNotMatchRegularExpression('/"8\.1"/', $this->read('.github/workflows/' . $workflow));
         }
     }
@@ -170,11 +170,65 @@ final class WorkflowPolicyTest extends TestCase
         self::assertMatchesRegularExpression('#tools/coverage-check\.php build/coverage/clover\.xml 95#', $composer);
     }
 
-    public function test_ci_runs_shellcheck_on_the_install_script(): void
+    public function test_the_install_script_workflow_runs_shellcheck_and_the_install_tests(): void
     {
-        $ci = $this->read('.github/workflows/ci.yml');
+        $workflow = $this->read('.github/workflows/install-script.yml');
 
-        self::assertMatchesRegularExpression('/run:[^\n]*\bshellcheck install\.sh\s*$/m', $ci);
+        self::assertMatchesRegularExpression('/run:[^\n]*\bshellcheck install\.sh\s*$/m', $workflow);
+        self::assertMatchesRegularExpression('#run:\s*vendor/bin/phpunit tests/Integration/Install\s*$#m', $workflow);
+        self::assertSame(
+            [
+                'install.sh',
+                'tests/Integration/Install/**',
+                'tests/Fixtures/http/release-router.php',
+                '.github/workflows/install-script.yml',
+            ],
+            $this->paths($workflow),
+        );
+    }
+
+    public function test_the_docs_workflow_runs_only_the_readme_tests(): void
+    {
+        $workflow = $this->read('.github/workflows/docs.yml');
+
+        self::assertMatchesRegularExpression('/run:\s*vendor\/bin\/phpunit tests\/Unit\/Docs\s*$/m', $workflow);
+        self::assertSame(['README.md', 'tests/Unit/Docs/**', '.github/workflows/docs.yml'], $this->paths($workflow));
+    }
+
+    public function test_ci_runs_only_for_php_code_tests_and_tool_configuration(): void
+    {
+        $paths = $this->paths($this->read('.github/workflows/ci.yml'));
+
+        foreach (['src/**', 'tests/**', 'composer.json', '.github/workflows/ci.yml'] as $expected) {
+            self::assertContains($expected, $paths);
+        }
+        foreach (['README.md', 'CHANGELOG.md', 'install.sh', '**.md'] as $excluded) {
+            self::assertNotContains($excluded, $paths);
+        }
+    }
+
+    #[DataProvider('pathFilteredWorkflows')]
+    public function test_push_and_pull_request_use_the_same_path_filter(string $file): void
+    {
+        $workflow = $this->read($file);
+
+        $pullRequest = substr($workflow, (int) strpos($workflow, 'pull_request:'));
+
+        self::assertSame(2, preg_match_all('/^    paths:\s*$/m', $workflow));
+        self::assertSame($this->paths($workflow), $this->paths($pullRequest));
+    }
+
+    /**
+     * @return array<string, array{string}>
+     */
+    public static function pathFilteredWorkflows(): array
+    {
+        $files = [];
+        foreach (['ci', 'docs', 'install-script', 'zizmor'] as $name) {
+            $files[$name] = ['.github/workflows/' . $name . '.yml'];
+        }
+
+        return $files;
     }
 
     public function test_the_cli_suite_passes_against_the_phar_in_ci(): void
@@ -259,11 +313,24 @@ final class WorkflowPolicyTest extends TestCase
     public static function workflowFiles(): array
     {
         $files = [];
-        foreach (['ci', 'release', 'zizmor'] as $name) {
+        foreach (['ci', 'docs', 'install-script', 'release', 'zizmor'] as $name) {
             $files[$name] = ['.github/workflows/' . $name . '.yml'];
         }
 
         return $files;
+    }
+
+    /**
+     * The first `paths:` list of a workflow trigger.
+     *
+     * @return list<string>
+     */
+    private function paths(string $workflow): array
+    {
+        preg_match('/^    paths:\s*\n((?:      - "[^"]+"\s*\n)+)/m', $workflow, $block);
+        preg_match_all('/- "([^"]+)"/', $block[1] ?? '', $entries);
+
+        return $entries[1];
     }
 
     private function read(string $relative): string
