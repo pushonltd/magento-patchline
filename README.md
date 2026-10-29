@@ -1,14 +1,9 @@
 <div align="center">
 
-<pre>
-pushonltd/
-             _       _     _ _
- _ __   __ _| |_ ___| |__ | (_)_ __   ___
-| '_ \ / _` | __/ __| '_ \| | | '_ \ / _ \
-| |_) | (_| | || (__| | | | | | | | |  __/
-| .__/ \__,_|\__\___|_| |_|_|_|_| |_|\___|
-|_|
-</pre>
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="docs/logo-dark.svg">
+  <img src="docs/logo-light.svg" alt="pushonltd/patchline" width="560">
+</picture>
 
 **Adobe's isolated security patches for Magento Open Source.<br>Checked, downloaded and applied on every deploy.**
 
