@@ -122,7 +122,7 @@ final class DryRunDetector
                 }
             }
 
-            $result = $this->classify($diff, $workDir, $warnings);
+            $result = $this->classify($patch, $diff, $workDir, $warnings);
             if ($result->state !== DetectionState::Unknown || $prerequisites === [] || !$sanitized) {
                 return $result;
             }
@@ -133,7 +133,7 @@ final class DryRunDetector
                 return $result->withWarning($failure);
             }
 
-            return $this->classify($diff, $tempDir, $warnings);
+            return $this->classify($patch, $diff, $tempDir, $warnings);
         } finally {
             if ($tempDir !== null) {
                 $this->filesystem->removeRecursive($tempDir);
@@ -283,7 +283,7 @@ final class DryRunDetector
     /**
      * @param list<string> $warnings
      */
-    private function classify(string $diff, string $workDir, array $warnings): DetectionResult
+    private function classify(RegistryPatch $patch, string $diff, string $workDir, array $warnings): DetectionResult
     {
         $forward = $this->binary->dryRun($diff, $workDir, false);
         $reverse = $this->binary->dryRun($diff, $workDir, true);
@@ -291,7 +291,39 @@ final class DryRunDetector
         return match (true) {
             !$forward->succeeded && $reverse->succeeded => DetectionResult::of(DetectionState::Applied, $warnings),
             $forward->succeeded && !$reverse->succeeded => DetectionResult::of(DetectionState::NotApplied, $warnings),
-            default => DetectionResult::unknown($warnings, $forward->output, $reverse->output),
+            default => DetectionResult::unknown(
+                [...$warnings, ...$this->absentFilesWarning($patch, $diff, $workDir)],
+                $forward->output,
+                $reverse->output,
+            ),
         };
+    }
+
+    /**
+     * Neither dry-run can pass while a file the diff changes is missing, so that is the likeliest reason.
+     *
+     * @return list<string>
+     */
+    private function absentFilesWarning(RegistryPatch $patch, string $diff, string $workDir): array
+    {
+        $absent = array_values(array_filter(
+            $this->parser->existingFiles($diff),
+            fn (string $path): bool => !$this->filesystem->isFile($workDir . '/' . $path),
+        ));
+        if ($absent === []) {
+            return [];
+        }
+
+        $one = count($absent) === 1;
+
+        return [sprintf(
+            'Patch %s changes %s, which %s not in the store, so its state is unknown.'
+            . ' Restore the missing %s: ece-patches apply would fail on %s too.',
+            $patch->id,
+            implode(', ', $absent),
+            $one ? 'is' : 'are',
+            $one ? 'file' : 'files',
+            $one ? 'it' : 'them',
+        )];
     }
 }

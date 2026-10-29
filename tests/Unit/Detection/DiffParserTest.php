@@ -129,6 +129,16 @@ final class DiffParserTest extends TestCase
         self::assertSame(['app/etc/gone.xml'], (new DiffParser())->files($diff));
     }
 
+    public function test_it_lists_the_files_a_diff_changes_but_not_the_files_it_creates(): void
+    {
+        $diff = "diff --git a/a.php b/a.php\n--- a/a.php\n+++ b/a.php\n@@ -1 +1 @@\n-x\n+y\n"
+            . "diff --git a/b.php b/b.php\nnew file mode 100644\n--- /dev/null\n+++ b/b.php\n@@ -0,0 +1 @@\n+y\n"
+            . "--- /dev/null\n+++ b/c.php\n@@ -0,0 +1 @@\n+y\n"
+            . "--- a/d.php\n+++ /dev/null\n@@ -1 +0,0 @@\n-x\n";
+
+        self::assertSame(['a.php', 'd.php'], (new DiffParser())->existingFiles($diff));
+    }
+
     public function test_it_finds_no_sections_in_an_empty_diff(): void
     {
         self::assertSame([], (new DiffParser())->sections(''));

@@ -26,6 +26,24 @@ final class DiffParser
     }
 
     /**
+     * @return list<string> the files the diff expects to exist: every file it touches except the ones it creates
+     */
+    public function existingFiles(string $diff): array
+    {
+        $paths = [];
+        foreach ($this->sections($diff) as $section) {
+            $creates = preg_match('/^--- \/dev\/null\r?$/m', $section->text) === 1;
+            if ($section->path === '' || $creates || in_array($section->path, $paths, true)) {
+                continue;
+            }
+
+            $paths[] = $section->path;
+        }
+
+        return $paths;
+    }
+
+    /**
      * @return list<DiffSection>
      */
     public function sections(string $diff): array
