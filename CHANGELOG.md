@@ -9,11 +9,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- `status`, `sync` and `verify` say when a newer release exists (checked against Packagist at most once a day, silent
-  offline, never changes the exit code or stdout). Turn it off with `--no-update-check`, `PATCHLINE_NO_UPDATE_CHECK=1`
-  or `extra.patchline.no-update-check`. Older releases reject that `extra` key ("Unknown key", exit 2), so upgrade
-  before adding it.
-- `install.sh` release asset: installs `patchline.phar`, checks its sha256 and, with `gh`, its build provenance.
+- `status`, `sync` and `verify` say when a newer release exists, with the command to update. Checked against
+  Packagist at most once a day and silent offline. It never changes the exit code or the text, json and junit reports:
+  the notice goes to stderr, or is a `::notice` annotation with `--format=github`. Turn it off with
+  `--no-update-check`, `PATCHLINE_NO_UPDATE_CHECK=1` or `extra.patchline.no-update-check`. Older releases reject that
+  `extra` key ("Unknown key", exit 2), so upgrade before adding it.
+- `install.sh` release asset: installs the latest (or `PATCHLINE_VERSION`) `patchline.phar`, checks its sha256 and,
+  with `gh` installed and logged in, its build provenance.
+- CI runs ShellCheck on `install.sh`.
+
+### Changed
+
+- The README recommends the released PHAR (`install.sh`); Composer is the alternative. The recommended wiring calls
+  `php patchline.phar rewind`.
 
 ## [0.0.2] - 2026-10-28
 
