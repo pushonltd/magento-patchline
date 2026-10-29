@@ -4,12 +4,15 @@ declare(strict_types=1);
 
 namespace Patchline\Tests\Unit\Update;
 
+use Patchline\Update\ReleaseFeed;
 use Patchline\Update\ReleaseFeedParser;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\UsesClass;
 use PHPUnit\Framework\TestCase;
 
 #[CoversClass(ReleaseFeedParser::class)]
+#[UsesClass(ReleaseFeed::class)]
 final class ReleaseFeedParserTest extends TestCase
 {
     /**

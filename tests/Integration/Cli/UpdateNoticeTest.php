@@ -6,16 +6,80 @@ namespace Patchline\Tests\Integration\Cli;
 
 use DateTimeImmutable;
 use LogicException;
+use Patchline\Analysis\AnalysisInput;
+use Patchline\Analysis\Analyzer;
+use Patchline\Analysis\PatchReport;
+use Patchline\Analysis\Report;
+use Patchline\Analysis\ReportSummary;
+use Patchline\Cli\Application;
+use Patchline\Cli\Command\CommandResult;
+use Patchline\Cli\Command\FailOn;
+use Patchline\Cli\Command\Inspection;
+use Patchline\Cli\Command\Inspector;
+use Patchline\Cli\Command\StatusCommand;
 use Patchline\Cli\Config;
+use Patchline\Cli\ConfigResolver;
+use Patchline\Cli\Console\ConsoleApplication;
 use Patchline\Cli\Console\PatchlineCommand;
+use Patchline\Cli\Console\RewindCommand;
+use Patchline\Cli\Console\StreamConsoleOutput;
 use Patchline\Cli\Container;
+use Patchline\Cli\Output\FormattedOutput;
+use Patchline\Cli\Output\GithubFormatter;
+use Patchline\Cli\Output\JsonFormatter;
+use Patchline\Cli\Output\RewindTextRenderer;
+use Patchline\Cli\Output\Style;
+use Patchline\Cli\Output\TextFormatter;
+use Patchline\Detection\DetectionResult;
+use Patchline\Detection\DetectionResults;
+use Patchline\Detection\DiffParser;
+use Patchline\Detection\DiffSection;
+use Patchline\Detection\DryRunDetector;
+use Patchline\Detection\FilteredDiff;
+use Patchline\Detection\PatchRun;
+use Patchline\Detection\SystemPatchBinary;
+use Patchline\Download\CredentialsResolver;
+use Patchline\Download\DownloadResult;
+use Patchline\Download\PatchDownloader;
+use Patchline\Infrastructure\GuzzleHttpClient;
 use Patchline\Infrastructure\HttpClient;
 use Patchline\Infrastructure\HttpResponse;
+use Patchline\Infrastructure\LocalFilesystem;
+use Patchline\Infrastructure\ProcessResult;
+use Patchline\Infrastructure\SymfonyProcessRunner;
+use Patchline\Installation\Installation;
+use Patchline\Installation\InstallationReader;
 use Patchline\PackageVersion;
+use Patchline\Queue\PatchQueue;
+use Patchline\Queue\QueueEntry;
+use Patchline\Queue\QueueEntryDiff;
+use Patchline\Queue\QueueReader;
+use Patchline\Queue\Source\CloudPatchesSource;
+use Patchline\Queue\Source\HotfixDirSource;
+use Patchline\Queue\Source\SourceResult;
+use Patchline\Registry\Area;
+use Patchline\Registry\ComponentResolver;
+use Patchline\Registry\DependencyGraph;
+use Patchline\Registry\InstalledComponents;
+use Patchline\Registry\LoadedRegistry;
+use Patchline\Registry\ParseResult;
+use Patchline\Registry\Registry;
+use Patchline\Registry\RegistryLoader;
+use Patchline\Registry\RegistryParser;
+use Patchline\Registry\RegistryPatch;
+use Patchline\Rewind\QueueRewinder;
+use Patchline\Rewind\RewindOutcome;
+use Patchline\Rewind\RewindResult;
+use Patchline\Rewind\RewindStep;
 use Patchline\Tests\Double\FakeHttpClient;
 use Patchline\Tests\Double\FrozenClock;
 use Patchline\Tests\Support\FixtureStore;
 use Patchline\Tests\Support\LocalServer;
+use Patchline\Update\ReleaseFeed;
+use Patchline\Update\ReleaseFeedParser;
+use Patchline\Update\UpdateAvailability;
+use Patchline\Update\UpdateChecker;
+use Patchline\Update\UpdateNotice;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\UsesClass;
 use PHPUnit\Framework\TestCase;
@@ -23,6 +87,72 @@ use PHPUnit\Framework\TestCase;
 #[CoversClass(PatchlineCommand::class)]
 #[CoversClass(Container::class)]
 #[UsesClass(Config::class)]
+#[UsesClass(AnalysisInput::class)]
+#[UsesClass(Analyzer::class)]
+#[UsesClass(Application::class)]
+#[UsesClass(Area::class)]
+#[UsesClass(CloudPatchesSource::class)]
+#[UsesClass(CommandResult::class)]
+#[UsesClass(ComponentResolver::class)]
+#[UsesClass(ConfigResolver::class)]
+#[UsesClass(ConsoleApplication::class)]
+#[UsesClass(CredentialsResolver::class)]
+#[UsesClass(DependencyGraph::class)]
+#[UsesClass(DetectionResult::class)]
+#[UsesClass(DetectionResults::class)]
+#[UsesClass(DiffParser::class)]
+#[UsesClass(DiffSection::class)]
+#[UsesClass(DownloadResult::class)]
+#[UsesClass(DryRunDetector::class)]
+#[UsesClass(FailOn::class)]
+#[UsesClass(FilteredDiff::class)]
+#[UsesClass(FormattedOutput::class)]
+#[UsesClass(GithubFormatter::class)]
+#[UsesClass(GuzzleHttpClient::class)]
+#[UsesClass(HotfixDirSource::class)]
+#[UsesClass(HttpResponse::class)]
+#[UsesClass(Inspection::class)]
+#[UsesClass(Inspector::class)]
+#[UsesClass(Installation::class)]
+#[UsesClass(InstallationReader::class)]
+#[UsesClass(InstalledComponents::class)]
+#[UsesClass(JsonFormatter::class)]
+#[UsesClass(LoadedRegistry::class)]
+#[UsesClass(LocalFilesystem::class)]
+#[UsesClass(PackageVersion::class)]
+#[UsesClass(ParseResult::class)]
+#[UsesClass(PatchDownloader::class)]
+#[UsesClass(PatchQueue::class)]
+#[UsesClass(PatchReport::class)]
+#[UsesClass(PatchRun::class)]
+#[UsesClass(ProcessResult::class)]
+#[UsesClass(QueueEntry::class)]
+#[UsesClass(QueueEntryDiff::class)]
+#[UsesClass(QueueReader::class)]
+#[UsesClass(QueueRewinder::class)]
+#[UsesClass(Registry::class)]
+#[UsesClass(RegistryLoader::class)]
+#[UsesClass(RegistryParser::class)]
+#[UsesClass(RegistryPatch::class)]
+#[UsesClass(ReleaseFeed::class)]
+#[UsesClass(ReleaseFeedParser::class)]
+#[UsesClass(Report::class)]
+#[UsesClass(ReportSummary::class)]
+#[UsesClass(RewindCommand::class)]
+#[UsesClass(RewindOutcome::class)]
+#[UsesClass(RewindResult::class)]
+#[UsesClass(RewindStep::class)]
+#[UsesClass(RewindTextRenderer::class)]
+#[UsesClass(SourceResult::class)]
+#[UsesClass(StatusCommand::class)]
+#[UsesClass(StreamConsoleOutput::class)]
+#[UsesClass(Style::class)]
+#[UsesClass(SymfonyProcessRunner::class)]
+#[UsesClass(SystemPatchBinary::class)]
+#[UsesClass(TextFormatter::class)]
+#[UsesClass(UpdateAvailability::class)]
+#[UsesClass(UpdateChecker::class)]
+#[UsesClass(UpdateNotice::class)]
 final class UpdateNoticeTest extends TestCase
 {
     private const ENABLED = ['PATCHLINE_NO_UPDATE_CHECK' => '0'];
