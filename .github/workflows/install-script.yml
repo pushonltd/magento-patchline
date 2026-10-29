@@ -1,0 +1,65 @@
+name: Install script
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "install.sh"
+      - "tests/Integration/Install/**"
+      - "tests/Fixtures/http/release-router.php"
+      - ".github/workflows/install-script.yml"
+  pull_request:
+    paths:
+      - "install.sh"
+      - "tests/Integration/Install/**"
+      - "tests/Fixtures/http/release-router.php"
+      - ".github/workflows/install-script.yml"
+
+permissions: {}
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  shellcheck:
+    name: ShellCheck
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: read # check out the repository
+    steps:
+      - name: Check out the repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      # ShellCheck is preinstalled on the Ubuntu runner: one less action to trust.
+      - name: Check install.sh
+        run: shellcheck --version && shellcheck install.sh
+
+  tests:
+    name: Install script tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read # check out the repository
+    steps:
+      - name: Check out the repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Set up PHP
+        uses: shivammathur/setup-php@eb7c497e18156a6bbabfef1d3a82760b9eda3962 # 2.40.0
+        with:
+          php-version: "8.5"
+          coverage: none
+          tools: composer:v2
+
+      - name: Install dependencies
+        run: composer update --no-interaction --no-progress --prefer-dist
+
+      # Checksum, provenance, --path and truncation behaviour against a local fake release.
+      - name: Run the install script tests
+        run: vendor/bin/phpunit tests/Integration/Install
