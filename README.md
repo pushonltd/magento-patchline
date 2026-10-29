@@ -22,16 +22,18 @@ pushonltd/
 [Where the patches come from](#where-the-patches-come-from) ·
 [Commands](#commands)
 
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="docs/status-dark.svg">
+  <img src="docs/status-light.svg" alt="patchline status: one patch applied, one queued in m2-hotfixes/, one missing" width="760">
+</picture>
+
 </div>
 
 ---
 
+Since `magento/magento-cloud-patches` 1.1.18, Adobe's security patches no longer reach Open Source.
+**Patchline finds the missing ones, drops them into `m2-hotfixes/`, and `ece-patches apply` does the rest.**
 A companion to [`magento/quality-patches`](https://github.com/magento/quality-patches).
-
-Since `magento/magento-cloud-patches` 1.1.18, Adobe's monthly security patches no longer reach Open Source through
-that package. **Patchline checks your store for them and applies the missing ones automatically.**
-`patchline sync` downloads them into `m2-hotfixes/`.
-With the [recommended wiring](#recommended-wiring), `ece-patches apply` puts them in on every `composer install`.
 
 ## Quick start
 
@@ -42,18 +44,13 @@ php patchline.phar sync      # download the missing ones into m2-hotfixes/
 php patchline.phar verify    # will ece-patches apply succeed?
 ```
 
-No Composer needed. Commit `m2-hotfixes/`. To apply the patches on every `composer install`, add the
-[wiring](#recommended-wiring).
+Commit `m2-hotfixes/`. To apply the patches on every `composer install`, add the [wiring](#recommended-wiring).
 
 ## Recommended wiring
 
-Add Patchline to the store with Composer:
-
 ```bash
-composer require pushonltd/magento-patchline
+composer require pushonltd/magento-patchline   # not --dev: the scripts also run on install --no-dev
 ```
-
-Not `--dev`: the scripts below also run on `composer install --no-dev`.
 
 In the store's `composer.json`:
 
@@ -65,50 +62,31 @@ In the store's `composer.json`:
 }
 ```
 
-Stock `ece-patches apply` expects a freshly unpacked `vendor/`.
-On a `vendor/` that is already patched (local DDEV, or a host that keeps `vendor/` between deploys) it can fail.
-
-**`patchline rewind` takes the queue back out first.** Then `ece-patches apply` starts clean every time.
-On a fresh install there is nothing to rewind, and it exits 0.
-
-To check the result, run `vendor/bin/patchline status` yourself or in CI.
-Don't add `status` to the composer scripts. It needs to reach Adobe's registry, and it exits 1 whenever Adobe ships
-a patch you haven't synced yet, so it would break `composer install`.
+- **`rewind` first**: stock `ece-patches apply` fails on an already patched `vendor/` (DDEV, hosts that keep
+  `vendor/`). On a fresh install `rewind` is a no-op.
+- **Not `status`**: it goes online and exits 1 on every new Adobe patch, breaking `composer install`. Use [CI](#ci).
 
 ## Where the patches come from
 
-Straight from Adobe.
+**Straight from Adobe. There is no third party in between:** no mirror, no hosted service, no patches of ours.
 
-Patchline reads Adobe's registry at
-[`repo.magento.com/patch/patch-registry.json`](https://repo.magento.com/patch/patch-registry.json)
-and downloads each diff from `repo.magento.com/patch/`.
-Every file is checked against the sha256 in the registry.
-It is the same registry Adobe's own `vendor/bin/patch-status` reads.
+- Registry: [`repo.magento.com/patch/patch-registry.json`](https://repo.magento.com/patch/patch-registry.json),
+  the one Adobe's own `patch-status` reads. Confirmed by Adobe as meant for public, automated use.
+- Diffs: `repo.magento.com/patch/`, each checked against the registry's sha256.
+- Commerce-only patches need repo.magento.com keys.
 
-Thanks to [@s-renz](https://github.com/s-renz) for finding the patch endpoint (and a great chat at [Meet Magento Germany 2026](https://de.meet-magento.com/)).
-
-**There is no third party in between.** No mirror, no hosted service, no patches of ours.
-That is deliberate. A security patch should come from the vendor who wrote it, and you should be able to check that it did.
-
-Adobe's Engineering Manager for Adobe Commerce Security and Compliance confirmed the registry is meant for public,
-automated use. Commerce-only patches need repo.magento.com keys.
+A security patch should come from the vendor who wrote it, and you should be able to check that it did.
+Thanks to [@s-renz](https://github.com/s-renz) for finding the endpoint (and a great chat at
+[Meet Magento Germany 2026](https://de.meet-magento.com/)).
 
 ## Install
 
-Magento 2.4.6+, PHP 8.2+ and a `patch` binary. Patchline only uses libraries Magento already installs.
+Magento 2.4.6+, PHP 8.2+, a `patch` binary. No dependencies beyond what Magento already installs.
 
-```bash
-curl -fsSL https://github.com/pushonltd/magento-patchline/releases/latest/download/install.sh | bash
-```
-
-This puts `patchline.phar` in the current directory. It runs without `composer install`.
-The script always checks the sha256. With `gh` installed and logged in, it also verifies the build provenance.
-Pin a version with `PATCHLINE_VERSION=v0.0.3`. Install elsewhere with `bash -s -- --path=/usr/local/bin/patchline`.
-
-Wiring it into `composer install`? Install it with Composer instead, as in [Recommended wiring](#recommended-wiring).
-
-`status`, `sync` and `verify` say when a newer release exists, at most once a day. Turn it off with
-`--no-update-check` or `PATCHLINE_NO_UPDATE_CHECK=1`.
+- **PHAR** (check and sync): the [Quick start](#quick-start) one-liner. Verifies the sha256, plus build provenance
+  if `gh` is logged in. Pin with `PATCHLINE_VERSION=v0.0.3`, relocate with `bash -s -- --path=/usr/local/bin/patchline`.
+- **Composer** (apply on install): see [Recommended wiring](#recommended-wiring).
+- Update notice at most once a day; off with `--no-update-check` or `PATCHLINE_NO_UPDATE_CHECK=1`.
 
 ## Commands
 
@@ -121,53 +99,32 @@ patchline rewind [--root=ROOT] [--dry-run]
 
 ### `status`
 
-Lists every registry patch for your Magento version and its state. Read-only.
-
-```text
-$ patchline status
-Magento Open Source 2.4.9
-Registry: remote
-Components: CE 2.4.9
-
-2026-09-08  CE  249-2026-09-001-CE  applied  1 CVE
-2026-10-13  CE  249-2026-10-001-CE  queued   m2-hotfixes/2026-10-13_249-2026-10-001-CE.patch  2 CVEs
-2026-10-20  CE  249-VULN-39341-CE   missing  1 CVE
-
-Summary: 1 applied, 1 queued, 1 missing
-Next: run patchline sync to download the missing patches.
-```
+Every registry patch for your Magento version and its [state](#patch-states) (screenshot above). Read-only.
 
 ### `sync`
 
-Downloads missing patches as `m2-hotfixes/<released>_<id>.patch`.
-The date prefix keeps release order, which `ece-patches apply` relies on.
-It never overwrites a file and never touches `vendor/`.
+Downloads missing patches as `m2-hotfixes/<released>_<id>.patch`; the date prefix keeps the release order
+`ece-patches apply` needs. Never overwrites, never touches `vendor/`.
 
 ### `verify`
 
-Replays the queue on a temporary copy, the way a fresh deploy would, and names the first patch that fails.
+Replays the queue on a temporary copy, like a fresh deploy, and names the first patch that fails.
 
 ### `rewind`
 
-Reverses the queue in `vendor/`, newest first. It is the only command that writes to `vendor/`.
+Reverses the queue in `vendor/`, newest first. **It is the only command that writes to `vendor/`.**
 
-It replays the whole queue on a temporary copy before it touches anything.
-If that replay fails, it changes nothing and exits 1.
-It works offline and reads only `--root` and `--dry-run`.
-
-A patch that is applied in `vendor/` but missing from the queue blocks it.
-A deleted `m2-hotfixes/` file is the usual cause. Run `patchline sync` and try again.
-
-Between `rewind` and `ece-patches apply`, `vendor/` is unpatched.
-**Don't run the pair against a docroot that serves traffic.** Run it in the build step.
+- Rehearses on a temporary copy first; if that fails, changes nothing and exits 1. Offline.
+- Blocked by a patch applied in `vendor/` but missing from the queue (usually a deleted hotfix file): run `sync`.
+- `vendor/` is unpatched until `ece-patches apply` runs. **Build step only, never a live docroot.**
 
 ### Options
 
 | Option | Commands | Meaning |
 |---|---|---|
 | `--root=ROOT` | all | Store root (default: current directory) |
-| `--format=FORMAT` | all but `rewind` | `text`, `json`, `github` or `junit` (`github` by default on GitHub Actions) |
-| `--fail-on=FAIL-ON` | all but `rewind` | States that exit with 1 (default `missing,duplicate,misordered`; also `cross-check`) |
+| `--format=FORMAT` | all but `rewind` | `text`, `json`, `github` or `junit` (default `github` on GitHub Actions) |
+| `--fail-on=FAIL-ON` | all but `rewind` | States that exit 1 (default `missing,duplicate,misordered`; also `cross-check`) |
 | `--registry=REGISTRY` | all but `rewind` | Registry URL or file instead of repo.magento.com |
 | `--cache-dir=CACHE-DIR` | all but `rewind` | Cache directory (default `<root>/var/patch_metadata`, shared with `patch-status`) |
 | `--no-cache` | all but `rewind` | Don't use cached files |
@@ -182,51 +139,46 @@ Between `rewind` and `ece-patches apply`, `vendor/` is unpatched.
 
 | State | Meaning |
 |---|---|
-| `applied` | Already in the code |
-| `queued` | Will be applied by `ece-patches apply` |
-| `missing` | Not in the code and not queued |
-| `duplicate` | Queued more than once, which makes `ece-patches apply` fail |
-| `misordered` | Queued before a patch it depends on |
-| `entitled` | Commerce-only patch, skipped without `--include-entitled` |
-| `unknown` | Could not be checked, e.g. locally modified files |
-| `not_applicable` | Only touches packages your store has removed |
+| `applied` | 🟢 Already in the code |
+| `queued` | 🟢 Will be applied by `ece-patches apply` |
+| `missing` | 🔴 Not in the code and not queued |
+| `duplicate` | 🔴 Queued more than once, which makes `ece-patches apply` fail |
+| `misordered` | 🔴 Queued before a patch it depends on |
+| `entitled` | 🟡 Commerce-only, skipped without `--include-entitled` |
+| `unknown` | 🟡 Could not be checked, e.g. locally modified files |
+| `not_applicable` | ⚪ Only touches packages your store has removed |
 
-`missing`, `duplicate` and `misordered` fail the run by default.
+🔴 states fail the run by default (see `--fail-on`).
 
 ## Exit codes
 
 | Code | Meaning |
 |---|---|
 | 0 | All good |
-| 1 | Something needs action (see `--fail-on`), `sync` or `verify` failed, or `rewind` was blocked |
+| 1 | Needs action (see `--fail-on`), `sync` or `verify` failed, or `rewind` was blocked |
 | 2 | Wrong usage |
-| 3 | Could not run: no registry, no `patch` binary, unreadable store, no `magento-cloud-patches` for `rewind` |
+| 3 | Could not run: no registry, no `patch` binary, unreadable store, or no `magento-cloud-patches` for `rewind` |
 
 ## Configuration
 
-Flags can also come from `PATCHLINE_*` environment variables or from `extra.patchline` in the store's
-`composer.json`. Flags win over the environment, the environment over `composer.json`.
+Any flag also works as a `PATCHLINE_*` variable or under `extra.patchline` in `composer.json`.
+Precedence: **flag › environment › `composer.json`**.
 
 ```json
 { "extra": { "patchline": { "fail-on": ["missing", "duplicate"] } } }
 ```
 
-Repo.magento.com keys come from `COMPOSER_AUTH` or `auth.json` and are only ever sent to repo.magento.com.
-Proxies come from `HTTPS_PROXY`.
+Keys come from `COMPOSER_AUTH` or `auth.json` and go only to repo.magento.com. Proxy: `HTTPS_PROXY`.
 
 ## CI
 
-Two jobs cover it.
-
-- **A daily sync.** Run `patchline sync --adopt --prune` on a schedule and open a pull request when `m2-hotfixes/`
-  changes. Daily, because Adobe ships hotfixes without a fixed date.
-- **A check on every pull request.** Run `patchline status` and `patchline verify`. `--format=github` adds
-  annotations and a job summary. `--format=junit` works with GitLab and Jenkins.
+- **Daily:** `sync --adopt --prune`, open a PR if `m2-hotfixes/` changed. Adobe has no fixed release day.
+- **Every PR:** `status` and `verify`. `--format=github` adds annotations and a job summary; `junit` suits GitLab and Jenkins.
 
 ## How it works
 
-Detection follows Adobe's `patch-status`: each patch is dry-run forwards and in reverse with `patch`, on temporary
-copies. Patchline also reads the queue `ece-patches apply` will use.
+Like Adobe's `patch-status`: each patch is dry-run forwards and in reverse with `patch` on temporary copies,
+then matched against the queue `ece-patches apply` will use.
 
 ## Development
 
