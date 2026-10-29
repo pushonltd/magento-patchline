@@ -170,6 +170,13 @@ final class WorkflowPolicyTest extends TestCase
         self::assertMatchesRegularExpression('#tools/coverage-check\.php build/coverage/clover\.xml 95#', $composer);
     }
 
+    public function test_ci_runs_shellcheck_on_the_install_script(): void
+    {
+        $ci = $this->read('.github/workflows/ci.yml');
+
+        self::assertMatchesRegularExpression('/run:[^\n]*\bshellcheck install\.sh\s*$/m', $ci);
+    }
+
     public function test_the_cli_suite_passes_against_the_phar_in_ci(): void
     {
         $ci = $this->read('.github/workflows/ci.yml');

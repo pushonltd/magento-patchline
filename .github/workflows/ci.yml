@@ -57,6 +57,22 @@ jobs:
       - name: Run static analysis
         run: composer analyse
 
+  shellcheck:
+    name: ShellCheck
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: read # check out the repository
+    steps:
+      - name: Check out the repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      # ShellCheck is preinstalled on the Ubuntu runner: one less action to trust.
+      - name: Check install.sh
+        run: shellcheck --version && shellcheck install.sh
+
   test:
     name: Tests (PHP ${{ matrix.php }}, ${{ matrix.os }}${{ matrix.dependencies == 'lowest' && ', lowest' || '' }})
     runs-on: ${{ matrix.os }}
