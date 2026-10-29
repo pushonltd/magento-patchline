@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Patchline\Cli;
 
+use Composer\InstalledVersions;
 use Patchline\Cli\Command\Command;
 use Patchline\Cli\Command\Inspector;
 use Patchline\Cli\Command\StatusCommand;
@@ -26,8 +27,10 @@ use Patchline\Infrastructure\LocalFilesystem;
 use Patchline\Infrastructure\ProcessRunner;
 use Patchline\Infrastructure\SymfonyProcessRunner;
 use Patchline\Infrastructure\SystemClock;
+use Patchline\PackageVersion;
 use Patchline\Rewind\QueueRewinder;
 use Patchline\Sync\Executor;
+use Patchline\Update\UpdateChecker;
 use Patchline\Verify\QueueReplayer;
 
 /**
@@ -40,7 +43,40 @@ final class Container
         private readonly HttpClient $http = new GuzzleHttpClient(),
         private readonly ProcessRunner $processes = new SymfonyProcessRunner(),
         private readonly Clock $clock = new SystemClock(),
+        private readonly HttpClient $updateHttp = new GuzzleHttpClient(2),
+        private readonly ?string $version = null,
+        private readonly ?string $pharPath = null,
     ) {
+    }
+
+    public function updateChecker(): UpdateChecker
+    {
+        return new UpdateChecker($this->filesystem, $this->updateHttp, $this->clock);
+    }
+
+    public function version(): string
+    {
+        return $this->version ?? PackageVersion::current();
+    }
+
+    /**
+     * @return string|null absolute path of the running PHAR, null for a Composer install
+     */
+    public function pharPath(): ?string
+    {
+        $path = $this->pharPath ?? \Phar::running(false);
+
+        return $path === '' ? null : $path;
+    }
+
+    /**
+     * Whether a Composer install lists patchline in require-dev (the README's install); true when Composer is silent.
+     */
+    public function devRequirement(): bool
+    {
+        $package = InstalledVersions::getAllRawData()[0]['versions'][PackageVersion::PACKAGE] ?? null;
+
+        return !is_array($package) || ($package['dev_requirement'] ?? true) !== false;
     }
 
     public function filesystem(): Filesystem

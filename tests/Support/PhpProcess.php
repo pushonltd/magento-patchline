@@ -22,7 +22,7 @@ final class PhpProcess
     public static function run(array $arguments, ?string $cwd = null, array $environment = []): array
     {
         $command = array_merge([PHP_BINARY], $arguments);
-        $env = array_merge(self::inheritedEnvironment(), $environment);
+        $env = array_merge(self::inheritedEnvironment(), ['PATCHLINE_NO_UPDATE_CHECK' => '1'], $environment);
         $process = proc_open($command, [1 => ['pipe', 'w'], 2 => ['pipe', 'w']], $pipes, $cwd, $env);
         if (!is_resource($process)) {
             throw new RuntimeException('Cannot start PHP process.');

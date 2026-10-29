@@ -233,7 +233,7 @@ final class GithubFormatter implements Formatter
     }
 
     /** @param array<string, string> $properties */
-    private static function command(string $name, array $properties, string $message): string
+    public static function command(string $name, array $properties, string $message): string
     {
         $props = [];
         foreach ($properties as $key => $value) {

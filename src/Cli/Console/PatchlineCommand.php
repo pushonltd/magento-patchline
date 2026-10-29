@@ -10,7 +10,9 @@ use Patchline\Cli\ConfigResolver;
 use Patchline\Cli\Container;
 use Patchline\Cli\Output\GithubFormatter;
 use Patchline\Cli\Output\Style;
+use Patchline\Cli\OutputFormat;
 use Patchline\CrossCheck\CrossCheckResult;
+use Patchline\Update\UpdateNotice;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -73,7 +75,13 @@ final class PatchlineCommand extends Command
                 InputOption::VALUE_NONE,
                 'Also handle patches that need an entitlement (ee, b2b).',
             )
-            ->addOption('cross-check', null, InputOption::VALUE_NONE, 'Compare with vendor/bin/patch-status.');
+            ->addOption('cross-check', null, InputOption::VALUE_NONE, 'Compare with vendor/bin/patch-status.')
+            ->addOption(
+                'no-update-check',
+                null,
+                InputOption::VALUE_NONE,
+                'Do not check for a newer Patchline release.',
+            );
 
         if (!$this->syncOptions) {
             return;
@@ -93,6 +101,11 @@ final class PatchlineCommand extends Command
             ? $this->container->crossCheck()->check($result->report, $config->root(), $config->noCache())
             : null;
         $this->write($config, $result, $crossCheck, $output);
+        try {
+            $this->noticeUpdate($config, $output);
+        } catch (\Throwable) {
+            // The report is already written: a failing update notice must never change the outcome.
+        }
 
         $failedCrossCheck = $config->failOnCrossCheck() && $crossCheck !== null && $crossCheck->hasDisagreements();
 
@@ -116,6 +129,36 @@ final class PatchlineCommand extends Command
         }
 
         $this->appendSummary($target, $summary, $output);
+    }
+
+    private function noticeUpdate(Config $config, OutputInterface $output): void
+    {
+        if (!$config->updateCheck()) {
+            return;
+        }
+        $current = $this->container->version();
+        $latest = $this->container->updateChecker()->latestNewerThan(
+            $current,
+            $config->updateUrl(),
+            $config->cacheDir() ?? $config->root() . '/var/patch_metadata',
+            !$config->noCache(),
+        );
+        if ($latest === null) {
+            return;
+        }
+
+        $notice = UpdateNotice::render(
+            $current,
+            $latest,
+            $this->container->pharPath(),
+            $this->cwd,
+            $this->container->devRequirement(),
+            $config->format(),
+        );
+        $target = $config->format() === OutputFormat::Github || !$output instanceof ConsoleOutputInterface
+            ? $output
+            : $output->getErrorOutput();
+        $target->write($notice, false, OutputInterface::OUTPUT_RAW);
     }
 
     private function style(Config $config, OutputInterface $output): Style

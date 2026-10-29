@@ -6,6 +6,8 @@ namespace Patchline\Cli;
 
 final class Config
 {
+    public const DEFAULT_UPDATE_URL = 'https://repo.packagist.org/p2/pushonltd/magento-patchline.json';
+
     /**
      * @param list<string> $failOnStates
      */
@@ -24,6 +26,8 @@ final class Config
         private readonly bool $dryRun,
         private readonly bool $adopt,
         private readonly bool $prune,
+        private readonly bool $updateCheck = true,
+        private readonly string $updateUrl = self::DEFAULT_UPDATE_URL,
     ) {
     }
 
@@ -98,5 +102,15 @@ final class Config
     public function prune(): bool
     {
         return $this->prune;
+    }
+
+    public function updateCheck(): bool
+    {
+        return $this->updateCheck;
+    }
+
+    public function updateUrl(): string
+    {
+        return $this->updateUrl;
     }
 }

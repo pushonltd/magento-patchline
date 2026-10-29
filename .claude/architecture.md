@@ -35,7 +35,8 @@ compatible with its own checker, `vendor/bin/patch-status` (the Commerce Version
   `PackageVersion` reads the installed version from `Composer\InstalledVersions`, and the PHAR build writes the
   release version into the bundled Composer metadata, so there is no version constant to keep in sync.
 - Shipped as a Composer package and as a self-contained PHAR (`dist/patchline.phar`, built with Box) that runs
-  before or without `composer install`.
+  before or without `composer install`. `install.sh` is a release asset that downloads the PHAR and checks it
+  (sha256 always, build provenance with `gh`).
 - Needs a `patch(1)` binary for detection and `verify` (GNU patch on Linux, Apple's patch on macOS).
 - Never interactive. No prompts, ever.
 
@@ -44,7 +45,7 @@ compatible with its own checker, `vendor/bin/patch-status` (the Commerce Version
 ```
 patchline status [--root=.] [--format=text|json|github|junit] [--fail-on=missing,duplicate,misordered]
                  [--registry=<url|file>] [--cache-dir=<dir>] [--no-cache] [--include-entitled]
-                 [--cross-check]
+                 [--cross-check] [--no-update-check]
 patchline sync   [same as status] [--dry-run] [--adopt] [--prune]
 patchline verify [same as status]
 patchline rewind [--root=.] [--dry-run]
@@ -58,6 +59,10 @@ Exit codes: `0` ok, `1` findings matching `--fail-on` (for `rewind`: blocked, no
 `rewind` is offline: it ignores the registry, `extra.patchline` and `PATCHLINE_*`. It simulates the whole
 rewind and replay on a temporary copy of the store and commits to `vendor/` only when the queue replays cleanly;
 a blocked rewind changes nothing.
+
+Network: besides repo.magento.com, the only request is to repo.packagist.org for the update notice (`status`, `sync`,
+`verify`; at most once a day, cached as `<cache-dir>/.patchline_update_check.json`, silent on failure). `rewind` stays
+offline. `--no-update-check`, `PATCHLINE_NO_UPDATE_CHECK=1` or `extra.patchline.no-update-check` turn it off.
 
 Configuration precedence: CLI flag > `PATCHLINE_*` environment variable > `extra.patchline` in the
 store's `composer.json` > default.
@@ -100,6 +105,7 @@ store's `composer.json` > default.
 | `Sync` | `Planner` (pure), `Plan`, `Action\{Download,Rename,Remove,Warn}`, `Executor` |
 | `Verify` | `QueueReplayer`, `VerifyResult` |
 | `Rewind` | `QueueRewinder` (simulate on a temp copy, then commit), `RewindResult`, `RewindStep`, `RewindOutcome` |
+| `Update` | `ReleaseFeed`, `ReleaseFeedParser`, `UpdateAvailability`, `UpdateChecker`, `UpdateNotice` (newer-release notice) |
 | `CrossCheck` | `PatchStatusCrossCheck` (runs Adobe's `vendor/bin/patch-status --format=json` and compares) |
 
 ## Patch states

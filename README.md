@@ -36,13 +36,13 @@ With the [recommended wiring](#recommended-wiring), `ece-patches apply` puts the
 ## Quick start
 
 ```bash
-composer require --dev pushonltd/magento-patchline
-vendor/bin/patchline status    # applied, queued or missing
-vendor/bin/patchline sync      # download the missing ones into m2-hotfixes/
-vendor/bin/patchline verify    # will ece-patches apply succeed?
+curl -fsSL https://github.com/pushonltd/magento-patchline/releases/latest/download/install.sh | bash
+php patchline.phar status    # applied, queued or missing
+php patchline.phar sync      # download the missing ones into m2-hotfixes/
+php patchline.phar verify    # will ece-patches apply succeed?
 ```
 
-Add the wiring below, commit `m2-hotfixes/` and deploy as usual.
+Add the wiring below, commit `patchline.phar` and `m2-hotfixes/`, and deploy as usual.
 
 ## Recommended wiring
 
@@ -52,19 +52,21 @@ In the store's `composer.json`:
 "scripts": {
     "post-install-cmd": ["@apply-patches"],
     "post-update-cmd": ["@apply-patches"],
-    "apply-patches": ["vendor/bin/patchline rewind", "vendor/bin/ece-patches apply"]
+    "apply-patches": ["php patchline.phar rewind", "vendor/bin/ece-patches apply"]
 }
 ```
 
-Every monthly patch rewrites `vendor/bin/patch-status`.
-So stock `ece-patches apply` works once, on a freshly unpacked `vendor/`.
-Run it again on the same `vendor/` and it fails on the older monthly patch.
-That is every `composer install` on a local DDEV or a host that keeps `vendor/` between deploys.
+Every monthly patch rewrites `vendor/bin/patch-status`, so stock `ece-patches apply` works once, on a freshly
+unpacked `vendor/`.
+Run it again on the same `vendor/` (local DDEV, or a host that keeps `vendor/` between deploys) and it fails on the
+older monthly patch.
 
 **`patchline rewind` takes the queue back out first.** Then `ece-patches apply` starts clean every time.
 On a fresh install there is nothing to rewind, and it exits 0.
 
-Check the result with `vendor/bin/patchline status`.
+Installed with Composer? Use `vendor/bin/patchline rewind` instead.
+
+Check the result with `php patchline.phar status`.
 Keep it out of the scripts. It needs the registry, and it fails as soon as Adobe ships a patch you haven't synced.
 
 ## Where the patches come from
@@ -90,11 +92,17 @@ automated use. Commerce-only patches need repo.magento.com keys.
 Magento 2.4.6+, PHP 8.2+ and a `patch` binary. Patchline only uses libraries Magento already installs.
 
 ```bash
-composer require --dev pushonltd/magento-patchline
+curl -fsSL https://github.com/pushonltd/magento-patchline/releases/latest/download/install.sh | bash
 ```
 
-Or take `patchline.phar` from the [releases](https://github.com/pushonltd/magento-patchline/releases) and check it
-with `sha256sum -c patchline.phar.sha256`. It runs without `composer install`.
+This puts `patchline.phar` in the current directory. It runs without `composer install`.
+The script always checks the sha256. With `gh` installed and logged in, it also verifies the build provenance.
+Pin a version with `PATCHLINE_VERSION=v0.0.3`. Install elsewhere with `bash -s -- --path=/usr/local/bin/patchline`.
+
+Or use Composer: `composer require --dev pushonltd/magento-patchline`, then run `vendor/bin/patchline`.
+
+`status`, `sync` and `verify` say when a newer release exists, at most once a day. Turn it off with
+`--no-update-check` or `PATCHLINE_NO_UPDATE_CHECK=1`.
 
 ## Commands
 
@@ -159,6 +167,7 @@ Between `rewind` and `ece-patches apply`, `vendor/` is unpatched.
 | `--no-cache` | all but `rewind` | Don't use cached files |
 | `--include-entitled` | all but `rewind` | Include Commerce-only patches (needs repo.magento.com keys) |
 | `--cross-check` | all but `rewind` | Compare the result with `vendor/bin/patch-status` |
+| `--no-update-check` | all but `rewind` | Don't check for a newer Patchline release |
 | `--dry-run` | `sync`, `rewind` | Show the plan, change nothing |
 | `--adopt` | `sync` | Rename hand-copied hotfix files to the dated naming |
 | `--prune` | `sync` | Remove hotfix files that duplicate cloud-patches files |
@@ -210,9 +219,8 @@ Two jobs cover it.
 
 ## How it works
 
-Detection follows Adobe's `patch-status`.
-Each patch is dry-run forwards and in reverse with `patch`, on temporary copies of the files it changes.
-Patchline also reads the queue `ece-patches apply` will use: required cloud patches, then `m2-hotfixes/*.patch`.
+Detection follows Adobe's `patch-status`: each patch is dry-run forwards and in reverse with `patch`, on temporary
+copies. Patchline also reads the queue `ece-patches apply` will use.
 
 ## Development
 

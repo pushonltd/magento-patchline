@@ -114,6 +114,52 @@ final class ConfigResolverTest extends TestCase
         self::assertFalse($config->noAnsi());
     }
 
+    public function test_it_enables_the_update_check_by_default(): void
+    {
+        self::assertTrue($this->resolve(['status'])->updateCheck());
+    }
+
+    public function test_it_disables_the_update_check_with_the_no_update_check_flag(): void
+    {
+        self::assertFalse($this->resolve(['status', '--no-update-check'])->updateCheck());
+    }
+
+    public function test_it_disables_the_update_check_with_patchline_no_update_check(): void
+    {
+        $config = $this->resolve(['status'], ['PATCHLINE_NO_UPDATE_CHECK' => '1']);
+
+        self::assertFalse($config->updateCheck());
+    }
+
+    public function test_it_disables_the_update_check_with_no_update_check_in_extra_patchline(): void
+    {
+        $this->writeExtra('{"no-update-check": true}');
+
+        self::assertFalse($this->resolve(['status'])->updateCheck());
+    }
+
+    public function test_it_lets_the_flag_win_over_the_environment_and_the_environment_over_extra_patchline(): void
+    {
+        $this->writeExtra('{"no-update-check": true}');
+
+        $envWins = $this->resolve(['status'], ['PATCHLINE_NO_UPDATE_CHECK' => '0']);
+        $flagWins = $this->resolve(['status', '--no-update-check'], ['PATCHLINE_NO_UPDATE_CHECK' => '0']);
+
+        self::assertTrue($envWins->updateCheck());
+        self::assertFalse($flagWins->updateCheck());
+    }
+
+    public function test_it_uses_the_packagist_url_unless_patchline_update_url_is_set(): void
+    {
+        $default = $this->resolve(['status']);
+        $empty = $this->resolve(['status'], ['PATCHLINE_UPDATE_URL' => '']);
+        $custom = $this->resolve(['status'], ['PATCHLINE_UPDATE_URL' => 'http://127.0.0.1:1/x.json']);
+
+        self::assertSame(Config::DEFAULT_UPDATE_URL, $default->updateUrl());
+        self::assertSame('https://repo.packagist.org/p2/pushonltd/magento-patchline.json', $empty->updateUrl());
+        self::assertSame('http://127.0.0.1:1/x.json', $custom->updateUrl());
+    }
+
     public function test_it_reads_booleans_from_the_environment(): void
     {
         $config = $this->resolve(['status'], ['PATCHLINE_NO_CACHE' => 'true', 'PATCHLINE_INCLUDE_ENTITLED' => '0']);

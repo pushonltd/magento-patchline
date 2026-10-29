@@ -202,6 +202,11 @@ final class WorkflowPolicyTest extends TestCase
             '/gh release create .*dist\/patchline\.phar\b.*dist\/patchline\.phar\.sha256/s',
             $release,
         );
+        self::assertMatchesRegularExpression(
+            '/gh release create .*dist\/patchline\.phar\.sha256\s+dist\/install\.sh\b/s',
+            $release,
+        );
+        self::assertMatchesRegularExpression('/cp install\.sh dist\/install\.sh/', $release);
         self::assertMatchesRegularExpression('/--version="\$\{?RELEASE_TAG\}?"/', $release);
         self::assertMatchesRegularExpression('/PATCHLINE_BIN:\s*dist\/patchline\.phar\b/', $release);
         self::assertMatchesRegularExpression('/run:\s*composer test:cli:phar\s*$/m', $release);
