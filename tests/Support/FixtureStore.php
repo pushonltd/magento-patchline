@@ -196,6 +196,7 @@ final class FixtureStore
 
         return [
             'PATCHLINE_ALLOW_INSECURE_REGISTRY' => '1',
+            'PATCHLINE_NO_UPDATE_CHECK' => '1',
             'HOME' => $home,
             'COMPOSER_HOME' => $home,
             'COMPOSER_AUTH' => '',

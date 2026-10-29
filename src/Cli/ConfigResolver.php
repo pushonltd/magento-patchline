@@ -26,9 +26,10 @@ final class ConfigResolver
     private const ENV_BOOLEANS = [
         'no-cache' => 'PATCHLINE_NO_CACHE',
         'include-entitled' => 'PATCHLINE_INCLUDE_ENTITLED',
+        'no-update-check' => 'PATCHLINE_NO_UPDATE_CHECK',
     ];
     private const EXTRA_STRINGS = ['format', 'registry', 'cache-dir'];
-    private const EXTRA_BOOLEANS = ['no-cache', 'include-entitled', 'cross-check', 'no-ansi'];
+    private const EXTRA_BOOLEANS = ['no-cache', 'include-entitled', 'cross-check', 'no-ansi', 'no-update-check'];
 
     public function __construct(private readonly Filesystem $filesystem)
     {
@@ -60,6 +61,8 @@ final class ConfigResolver
             $this->flag($args, 'dry-run'),
             $this->flag($args, 'adopt'),
             $this->flag($args, 'prune'),
+            !$this->bool('no-update-check', $args, $env, $extra),
+            ($env['PATCHLINE_UPDATE_URL'] ?? '') !== '' ? $env['PATCHLINE_UPDATE_URL'] : Config::DEFAULT_UPDATE_URL,
         );
     }
 

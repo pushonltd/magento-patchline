@@ -556,6 +556,7 @@ final class ApplicationTest extends TestCase
         self::assertIsResource($stdout);
         self::assertIsResource($stderr);
 
+        $env = ['PATCHLINE_NO_UPDATE_CHECK' => '1', ...$env];
         $exitCode = $application->run($argv, $env, '/nowhere', $stdout, $stderr);
         rewind($stdout);
         rewind($stderr);

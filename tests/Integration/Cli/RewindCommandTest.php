@@ -180,7 +180,7 @@ final class RewindCommandTest extends TestCase
 
         $exitCode = (new Application())->run(
             ['rewind', '--root=' . $store->root() . '/missing'],
-            [],
+            ['PATCHLINE_NO_UPDATE_CHECK' => '1'],
             $store->root(),
             $stdout,
             $stderr,

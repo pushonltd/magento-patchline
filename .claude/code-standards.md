@@ -62,6 +62,6 @@ release workflows, Dependabot with a cooldown. Findings are fixed; the only exce
 
 ## Package README
 
-The README starts with a one-paragraph description and a quick-start, then: installation (Composer and
-single file), commands, states, exit codes, configuration, CI usage, how detection works,
+The README starts with a one-paragraph description and a quick-start, then: installation (single file
+first, then Composer), commands, states, exit codes, configuration, CI usage, how detection works,
 compatibility with Adobe's tools, development, and license.

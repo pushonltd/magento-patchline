@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- `status`, `sync` and `verify` say when a newer release exists (checked against Packagist at most once a day, silent
+  offline, never changes the exit code or stdout). Turn it off with `--no-update-check`, `PATCHLINE_NO_UPDATE_CHECK=1`
+  or `extra.patchline.no-update-check`. Older releases reject that `extra` key ("Unknown key", exit 2), so upgrade
+  before adding it.
+- `install.sh` release asset: installs `patchline.phar`, checks its sha256 and, with `gh`, its build provenance.
+
 ## [0.0.2] - 2026-10-28
 
 ### Added

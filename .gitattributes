@@ -13,3 +13,4 @@
 /infection.json5 export-ignore
 /CLAUDE.md export-ignore
 /box.json.dist export-ignore
+/install.sh export-ignore
