@@ -30,9 +30,15 @@ itself.
 Patchline checks the store against the registry, reports which patches are missing, and downloads them into
 `m2-hotfixes/`. It does not apply them. `ece-patches apply` does that, as it does for any file in `m2-hotfixes/`.
 
+> [!IMPORTANT]
+> Patchline is an add-on to Adobe's [Quality Patches Tool](https://github.com/magento/quality-patches), not a
+> replacement. It expects the store to install patches the way Adobe documents it:
+> `composer require magento/quality-patches`, which brings `magento/magento-cloud-patches` and
+> `vendor/bin/ece-patches`, and `ece-patches apply` on every build.
+
 ## How it fits with Adobe's patch tooling
 
-`ece-patches apply` (from `magento/magento-cloud-patches`) applies three sets of patches, in this order:
+`ece-patches apply` applies three sets of patches, in this order:
 
 | # | Patches | Chosen by |
 |---|---|---|
@@ -65,7 +71,8 @@ A fourth command, `rewind`, is a workaround for `ece-patches apply` itself: see
 
 ## Getting started
 
-Requirements: Magento 2.4.6 or newer, PHP 8.2+, a `patch` binary.
+Requirements: Magento 2.4.6 or newer with [`magento/quality-patches`](https://github.com/magento/quality-patches)
+installed, PHP 8.2+, a `patch` binary.
 
 ```bash
 curl -fsSL https://github.com/pushonltd/magento-patchline/releases/latest/download/install.sh | bash
