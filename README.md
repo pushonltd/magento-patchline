@@ -5,17 +5,12 @@
   <img src="docs/logo-light.svg" alt="pushonltd/patchline" width="560">
 </picture>
 
-**Adobe's isolated security patches for Magento Open Source.<br>Checked, downloaded and applied on every deploy.**
+Finds the Adobe security patches a Magento Open Source store is missing and downloads them into `m2-hotfixes/`.
 
 [![CI](https://github.com/pushonltd/magento-patchline/actions/workflows/ci.yml/badge.svg)](https://github.com/pushonltd/magento-patchline/actions/workflows/ci.yml)
 [![Packagist](https://img.shields.io/packagist/v/pushonltd/magento-patchline)](https://packagist.org/packages/pushonltd/magento-patchline)
 [![PHP](https://img.shields.io/packagist/dependency-v/pushonltd/magento-patchline/php)](composer.json)
 [![License](https://img.shields.io/packagist/l/pushonltd/magento-patchline)](LICENSE)
-
-[Quick start](#quick-start) ·
-[Recommended wiring](#recommended-wiring) ·
-[Where the patches come from](#where-the-patches-come-from) ·
-[Commands](#commands)
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="docs/status-dark.svg">
@@ -26,28 +21,80 @@
 
 ---
 
-Since `magento/magento-cloud-patches` 1.1.18, Adobe's security patches no longer reach Open Source.
-**Patchline finds the missing ones, drops them into `m2-hotfixes/`, and `ece-patches apply` does the rest.**
-A companion to [`magento/quality-patches`](https://github.com/magento/quality-patches).
+Adobe publishes isolated security patches for Magento in a public registry,
+[`repo.magento.com/patch/patch-registry.json`](https://repo.magento.com/patch/patch-registry.json), the same one
+its own `patch-status` tool reads. Up to `magento/magento-cloud-patches` 1.1.18 these patches came with
+`ece-patches apply`. Later versions no longer ship them for Open Source, so an Open Source store has to fetch them
+itself.
 
-## Quick start
+Patchline checks the store against the registry, reports which patches are missing, and downloads them into
+`m2-hotfixes/`. It does not apply them. `ece-patches apply` does that, as it does for any file in `m2-hotfixes/`.
+
+## How it fits with Adobe's patch tooling
+
+`ece-patches apply` (from `magento/magento-cloud-patches`) applies three sets of patches, in this order:
+
+| # | Patches | Chosen by |
+|---|---|---|
+| 1 | Required patches bundled in `magento/magento-cloud-patches` | Adobe |
+| 2 | Quality patches from `magento/quality-patches` listed in `QUALITY_PATCHES` | You |
+| 3 | `m2-hotfixes/*.patch` | You, and Patchline for security patches |
+
+Patchline only writes to step 3. Quality patches are Adobe's non-security fixes; you choose them and
+`magento/quality-patches` supplies them, as before. Patchline does not track them, and `verify` does not replay them.
+
+## What the commands do
+
+```mermaid
+flowchart LR
+    registry[(Adobe registry)] --> status
+    store[Store code<br>and m2-hotfixes/] --> status
+    status["<b>status</b><br>applied, queued or missing?"] -->|missing| sync
+    sync["<b>sync</b><br>download into m2-hotfixes/"] --> verify
+    verify["<b>verify</b><br>replay the queue on a temporary copy"] --> ok([ece-patches apply will succeed])
+```
+
+- **`status`** lists every registry patch for the store's Magento version and whether it is already in the code,
+  queued for `ece-patches apply`, or missing. Read-only.
+- **`sync`** downloads the missing patches into `m2-hotfixes/`. It never overwrites a file and never touches `vendor/`.
+- **`verify`** replays the queue on a temporary copy of the store, like a fresh deploy, and names the first patch
+  that fails.
+
+A fourth command, `rewind`, is a workaround for `ece-patches apply` itself: see
+[Applying on every install](#recommended-wiring).
+
+## Getting started
+
+Requirements: Magento 2.4.6 or newer, PHP 8.2+, a `patch` binary.
 
 ```bash
 curl -fsSL https://github.com/pushonltd/magento-patchline/releases/latest/download/install.sh | bash
-php patchline.phar status    # applied, queued or missing
-php patchline.phar sync      # download the missing ones into m2-hotfixes/
-php patchline.phar verify    # will ece-patches apply succeed?
+php patchline.phar status
+php patchline.phar sync
+php patchline.phar verify
 ```
 
-Commit `m2-hotfixes/`. To apply the patches on every `composer install`, add the [wiring](#recommended-wiring).
+Commit `m2-hotfixes/`. The next `ece-patches apply` applies the new patches.
+
+The installer checks the PHAR's sha256, and its build provenance when `gh` is logged in. Pass
+`--version=vX.Y.Z` (or `PATCHLINE_VERSION`) to pin a release and `--path=FILE` to install elsewhere:
+
+```bash
+curl -fsSL https://github.com/pushonltd/magento-patchline/releases/latest/download/install.sh | bash -s -- --version=vX.Y.Z --path=/usr/local/bin/patchline
+```
+
+The package is also on Packagist as `pushonltd/magento-patchline`, which you need for the next section.
 
 ## Recommended wiring
+
+To apply the patches on every `composer install`, run `ece-patches apply` from the store's Composer scripts.
+Stock `ece-patches apply` fails when `vendor/` already contains the patches, which happens on hosts and local setups
+that keep `vendor/` between installs (DDEV, for example). `patchline rewind` reverses the queued patches first, so
+`ece-patches apply` starts from clean code:
 
 ```bash
 composer require pushonltd/magento-patchline   # not --dev: the scripts also run on install --no-dev
 ```
-
-In the store's `composer.json`:
 
 ```json
 "scripts": {
@@ -57,31 +104,23 @@ In the store's `composer.json`:
 }
 ```
 
-- **`rewind` first**: stock `ece-patches apply` fails on an already patched `vendor/` (DDEV, hosts that keep
-  `vendor/`). On a fresh install `rewind` is a no-op.
-- **Not `status`**: it goes online and exits 1 on every new Adobe patch, breaking `composer install`. Use [CI](#ci).
+`rewind` is the only command that writes to `vendor/`:
 
-## Where the patches come from
+- On a fresh `vendor/` it does nothing.
+- It rehearses on a temporary copy first. If that fails, it changes nothing and exits 1. It works offline.
+- It stops when a patch is applied in `vendor/` but missing from the queue, usually because a hotfix file was
+  deleted. Run `sync` to restore it.
+- Between `rewind` and `ece-patches apply`, `vendor/` is unpatched. Use it in a build step, never on a live docroot.
 
-**Straight from Adobe. There is no third party in between:** no mirror, no hosted service, no patches of ours.
+Don't put `status` in these scripts. It goes online and exits 1 whenever Adobe releases a new patch, which would
+break `composer install`. Run it in CI instead.
 
-- Registry: [`repo.magento.com/patch/patch-registry.json`](https://repo.magento.com/patch/patch-registry.json),
-  the one Adobe's own `patch-status` reads. Confirmed by Adobe as meant for public, automated use.
-- Diffs: `repo.magento.com/patch/`, each checked against the registry's sha256.
-- Commerce-only patches need repo.magento.com keys.
+## Running in CI
 
-A security patch should come from the vendor who wrote it, and you should be able to check that it did.
-Thanks to [@s-renz](https://github.com/s-renz) for finding the endpoint (and a great chat at
-[Meet Magento Germany 2026](https://de.meet-magento.com/)).
-
-## Install
-
-Magento 2.4.6+, PHP 8.2+, a `patch` binary. No dependencies beyond what Magento already installs.
-
-- **PHAR** (check and sync): the [Quick start](#quick-start) one-liner. Verifies the sha256, plus build provenance
-  if `gh` is logged in. Pin with `PATCHLINE_VERSION=v0.0.3`, relocate with `bash -s -- --path=/usr/local/bin/patchline`.
-- **Composer** (apply on install): see [Recommended wiring](#recommended-wiring).
-- Update notice at most once a day; off with `--no-update-check` or `PATCHLINE_NO_UPDATE_CHECK=1`.
+- **Daily:** `sync --adopt --prune`, and open a pull request if `m2-hotfixes/` changed. Adobe has no fixed release
+  day.
+- **On every pull request:** `status` and `verify`. `--format=github` adds annotations and a job summary; `junit`
+  works with GitLab and Jenkins.
 
 ## Commands
 
@@ -94,24 +133,22 @@ patchline rewind [--root=ROOT] [--dry-run]
 
 ### `status`
 
-Every registry patch for your Magento version and its [state](#patch-states) (screenshot above). Read-only.
+Lists every registry patch for the store's Magento version with its [state](#patch-states). Read-only.
 
 ### `sync`
 
-Downloads missing patches as `m2-hotfixes/<released>_<id>.patch`; the date prefix keeps the release order
-`ece-patches apply` needs. Never overwrites, never touches `vendor/`.
+Downloads missing patches as `m2-hotfixes/<released>_<id>.patch`. `ece-patches apply` applies `m2-hotfixes/` in
+file name order, so the date prefix keeps patches in release order. Never overwrites a file, never touches `vendor/`.
 
 ### `verify`
 
-Replays the queue on a temporary copy, like a fresh deploy, and names the first patch that fails.
+Replays cloud-patches' required patches and `m2-hotfixes/` on a temporary copy of the store and names the first
+patch that fails.
 
 ### `rewind`
 
-Reverses the queue in `vendor/`, newest first. **It is the only command that writes to `vendor/`.**
-
-- Rehearses on a temporary copy first; if that fails, changes nothing and exits 1. Offline.
-- Blocked by a patch applied in `vendor/` but missing from the queue (usually a deleted hotfix file): run `sync`.
-- `vendor/` is unpatched until `ece-patches apply` runs. **Build step only, never a live docroot.**
+Reverses the queued patches in `vendor/`, newest first, so `ece-patches apply` can run on it. See
+[Recommended wiring](#recommended-wiring).
 
 ### Options
 
@@ -145,6 +182,9 @@ Reverses the queue in `vendor/`, newest first. **It is the only command that wri
 
 🔴 states fail the run by default (see `--fail-on`).
 
+A patch counts as `applied` when it dry-runs in reverse on a temporary copy of the code, the same check Adobe's
+`patch-status` does.
+
 ## Exit codes
 
 | Code | Meaning |
@@ -156,24 +196,24 @@ Reverses the queue in `vendor/`, newest first. **It is the only command that wri
 
 ## Configuration
 
-Any flag also works as a `PATCHLINE_*` variable or under `extra.patchline` in `composer.json`.
-Precedence: **flag › environment › `composer.json`**.
+Every option also works as a `PATCHLINE_*` environment variable or under `extra.patchline` in the store's
+`composer.json`. A flag wins over the environment, and the environment wins over `composer.json`.
 
 ```json
 { "extra": { "patchline": { "fail-on": ["missing", "duplicate"] } } }
 ```
 
-Keys come from `COMPOSER_AUTH` or `auth.json` and go only to repo.magento.com. Proxy: `HTTPS_PROXY`.
+repo.magento.com keys come from `COMPOSER_AUTH` or `auth.json` and are sent only to repo.magento.com. Set
+`HTTPS_PROXY` to use a proxy.
 
-## CI
+## Network
 
-- **Daily:** `sync --adopt --prune`, open a PR if `m2-hotfixes/` changed. Adobe has no fixed release day.
-- **Every PR:** `status` and `verify`. `--format=github` adds annotations and a job summary; `junit` suits GitLab and Jenkins.
+Patchline downloads the registry and the patch files from repo.magento.com and checks each file against the sha256
+in the registry. Adobe confirmed the registry is meant for public, automated use. The only other request is a daily
+check of Packagist for a newer Patchline release; turn it off with `--no-update-check` or
+`PATCHLINE_NO_UPDATE_CHECK=1`. `rewind` makes no requests.
 
-## How it works
-
-Like Adobe's `patch-status`: each patch is dry-run forwards and in reverse with `patch` on temporary copies,
-then matched against the queue `ece-patches apply` will use.
+Thanks to [@s-renz](https://github.com/s-renz) for finding the registry endpoint.
 
 ## Development
 
